@@ -3,11 +3,13 @@ FROM python:3.11-slim
 # Establecer el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Copiar solo el script principal al directorio de trabajo /app
-COPY main.py /app/
+# Copiar requirements y instalar dependencias
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Instalar las dependencias necesarias
-RUN pip install --no-cache-dir python-dotenv python-telegram-bot transformers torch
+# Copiar archivos necesarios al contenedor
+COPY main.py /app/
+COPY sender_groups.json /app/
 
 # Comando para ejecutar el script
 CMD ["python", "main.py"]
