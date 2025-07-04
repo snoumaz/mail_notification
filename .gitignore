@@ -1,0 +1,5 @@
+.env
+__pycache__/
+.pytest_cache/
+sender_groups.json
+
