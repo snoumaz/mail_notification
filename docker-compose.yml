@@ -1,6 +1,6 @@
 services:
   organizador:
-    image: davtechw/mail_noty_telegram:v1
+    image: davtechw/mail_noty_telegram:latest
     container_name: organizador
     volumes:
       - ./sender_groups.json:/app/sender_groups.json:ro

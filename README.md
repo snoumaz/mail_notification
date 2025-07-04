@@ -177,12 +177,18 @@ sudo chown emailbot:emailbot /opt/organizador
 ```bash
 # Clonar el repositorio
 cd /opt/organizador
+sudo git clone <repository-url> .
+# Usuario emailbot
 sudo -u emailbot git clone <repository-url> .
 
 # Crear entorno virtual
+sudo python3 -m venv venv
+# Usuario emailbot
 sudo -u emailbot python3 -m venv venv
 
 # Activar entorno virtual e instalar dependencias
+sudo bash -c "source venv/bin/activate && pip install -r requirements.txt"
+# Usuario emailbot
 sudo -u emailbot bash -c "source venv/bin/activate && pip install -r requirements.txt"
 ```
 
@@ -190,9 +196,11 @@ sudo -u emailbot bash -c "source venv/bin/activate && pip install -r requirement
 
 ```bash
 # Copiar archivo de ejemplo
+sudo cp .env.example .env
 sudo -u emailbot cp .env.example .env
 
 # Editar configuración
+sudo nano .env
 sudo -u emailbot nano .env
 ```
 
@@ -208,8 +216,8 @@ Wants=network.target
 
 [Service]
 Type=simple
-User=emailbot
-Group=emailbot
+User=emailbot <= Cambiar al usuario
+Group=emailbot <= Cambiar al grupo
 WorkingDirectory=/opt/organizador
 Environment=PATH=/opt/organizador/venv/bin
 ExecStart=/opt/organizador/venv/bin/python main.py
