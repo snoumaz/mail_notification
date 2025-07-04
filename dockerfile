@@ -7,7 +7,7 @@ WORKDIR /app
 COPY main.py /app/
 
 # Instalar las dependencias necesarias
-RUN pip install --no-cache-dir python-dotenv python-telegram-bot
+RUN pip install --no-cache-dir python-dotenv python-telegram-bot transformers torch
 
 # Comando para ejecutar el script
 CMD ["python", "main.py"]
