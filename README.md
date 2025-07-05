@@ -33,6 +33,41 @@ El sistema envía automáticamente un **resumen diario** a Telegram con los remi
 python main.py send_summary
 ```
 
+- Si usas Docker:
+
+```bash
+docker exec -it organizador_email_monitor python main.py send_summary
+```
+
+---
+
+## ⚡ Comandos Útiles
+
+| Acción                       | Comando                                                                 |
+| ---------------------------- | ----------------------------------------------------------------------- |
+| Ejecutar monitor principal   | `python main.py`                                                        |
+| Probar notificación Telegram | `python main.py test_telegram`                                          |
+| Probar clasificación IA      | `python main.py test_classify`                                          |
+| Ejecutar tests               | `python -m pytest tests/test_main.py -v`                                |
+| Enviar resumen diario manual | `python main.py send_summary`                                           |
+| Resumen manual en Docker     | `docker exec -it organizador_email_monitor python main.py send_summary` |
+
+---
+
+## 🛠️ Ejemplo de archivo `.env`
+
+```env
+IMAP_SERVER=imap.gmail.com
+MAIL=tu-email@gmail.com
+PASS=tu-contraseña-de-aplicación
+TELEGRAM_TOKEN=token_de_tu_bot
+TELEGRAM_CHAT_ID=tu_chat_id
+NOTIFY_DOMAINS=gmail.com,hotmail.com
+LABEL_CANDIDATES=Urgente,Importante,Otros
+LOG_LEVEL=INFO
+DAILY_SUMMARY_TIME=21:00
+```
+
 ---
 
 ## Funcionalidades

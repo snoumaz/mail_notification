@@ -28,7 +28,7 @@
 1. Clona el repositorio en tu máquina o servidor:
 
 ```bash
-git clone https://github.com/tu-usuario/organizador.git
+git clone https://github.com/dav-tech-work/mail_notification.git
 cd organizador
 ```
 
@@ -176,6 +176,35 @@ docker exec -it organizador_email_monitor python main.py send_summary
 Asegúrate de tener en tu `.env`:
 
 ```env
+DAILY_SUMMARY_TIME=21:00
+```
+
+---
+
+## ⚡ Comandos Útiles
+
+| Acción                       | Comando                                                                            |
+| ---------------------------- | ---------------------------------------------------------------------------------- |
+| Ejecutar monitor principal   | `docker compose up -d`                                                             |
+| Ver logs                     | `docker logs -f organizador_email_monitor`                                         |
+| Probar notificación Telegram | `docker exec -it organizador_email_monitor python main.py test_telegram`           |
+| Probar clasificación IA      | `docker exec -it organizador_email_monitor python main.py test_classify`           |
+| Ejecutar tests               | `docker exec -it organizador_email_monitor python -m pytest tests/test_main.py -v` |
+| Enviar resumen diario manual | `docker exec -it organizador_email_monitor python main.py send_summary`            |
+
+---
+
+## 🛠️ Ejemplo de archivo `.env`
+
+```env
+IMAP_SERVER=imap.gmail.com
+MAIL=tu-email@gmail.com
+PASS=tu-contraseña-de-aplicación
+TELEGRAM_TOKEN=token_de_tu_bot
+TELEGRAM_CHAT_ID=tu_chat_id
+NOTIFY_DOMAINS=gmail.com,hotmail.com
+LABEL_CANDIDATES=Urgente,Importante,Otros
+LOG_LEVEL=INFO
 DAILY_SUMMARY_TIME=21:00
 ```
 
