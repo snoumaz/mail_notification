@@ -1,0 +1,18 @@
+# Configuración del servidor IMAP
+IMAP_SERVER=imap.gmail.com
+MAIL=tu_email@gmail.com
+PASS=tu_contraseña_de_aplicacion
+
+# Configuración de Telegram
+TELEGRAM_TOKEN=tu_token_del_bot
+TELEGRAM_CHAT_ID=tu_chat_id
+
+# Configuración opcional
+NOTIFY_DOMAINS=gmail.com,hotmail.com,outlook.com
+LABEL_CANDIDATES=Urgente,Importante,Otros
+
+# Configuración del scheduler (opcional)
+DAILY_SUMMARY_TIME=21:00
+CHECK_INTERVAL=120
+CLEANUP_DAYS=30
+SUMMARY_EMAIL_RECIPIENT=destinatario@ejemplo.com

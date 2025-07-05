@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  organizador:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: organizador_email_monitor
+    volumes:
+      # Solo archivos de configuración necesarios
+      - ./sender_groups.json:/app/sender_groups.json:ro
+      - ./logs:/app/logs
+      - ./data:/app/data
+    environment:
+      # Variables de entorno desde archivo .env
+      - IMAP_SERVER=${IMAP_SERVER}
+      - MAIL=${MAIL}
+      - PASS=${PASS}
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - NOTIFY_DOMAINS=${NOTIFY_DOMAINS}
+      - LABEL_CANDIDATES=${LABEL_CANDIDATES}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - TZ=Europe/Madrid
+    # Configuración de seguridad
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/tmp
+    user: '1000:1000'  # Usuario no-root
+    security_opt:
+      - no-new-privileges:true
+      - seccomp:unconfined
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    # Configuración de recursos
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    # Configuración de red
+    networks:
+      - organizador_net
+    # Configuración de reinicio
+    restart: unless-stopped
+    # Configuración de salud
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8080/health', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # Configuración de logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Servicio de monitoreo (opcional)
+  monitoring:
+    image: prom/prometheus:latest
+    container_name: organizador_monitoring
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    networks:
+      - organizador_net
+    restart: unless-stopped
+
+networks:
+  organizador_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  prometheus_data:
+    driver: local

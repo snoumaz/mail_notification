@@ -1,0 +1,25 @@
+services:
+  organizador:
+    build:
+      context: ..
+      dockerfile: docker/dockerfile
+    container_name: organizador_email_monitor
+    volumes:
+      - ./sender_groups.json:/app/sender_groups.json:ro
+      - ./.env:/app/.env:ro
+      - ./logs:/app/logs
+      - ./data:/app/data
+    environment:
+      - TZ=Europe/Madrid
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+    networks:
+      - organizador_net
+
+networks:
+  organizador_net:
+    driver: bridge

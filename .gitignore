@@ -1,6 +1,118 @@
+# Variables de entorno y configuración
 .env
-__pycache__/
-.pytest_cache/
-sender_groups.json
+.env.local
+.env.production
+.env.staging
+.env.test
+
+# Credenciales y archivos de configuración sensibles
 gmail_credentials.json
+sender_groups.json
+config.json
+secrets.json
+credentials.json
+token.json
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+
+# Caché de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Caché de pytest
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Logs
+*.log
+logs/
+log/
+
+# Archivos temporales
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Archivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Archivos de sistema
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Archivos de Docker
+.dockerignore
+docker-compose.override.yml
+
+# Archivos de datos de ejemplo que podrían contener información sensible
+*_example.json
+*_exemple.json
+*_sample.json
+*_template.json
+
+# Archivos de backup
+*.bak
+*.backup
+*.old
+
+# Archivos de configuración local
+local_config.py
+local_settings.py
+
+# Archivos de base de datos
+*.db
+*.sqlite
+*.sqlite3
+
+# Archivos de caché de aplicaciones
+.cache/
+cache/
+
+# Archivos de notificaciones y reportes temporales
+notifications/
+reports/
+output/
+temp/
+tmp/
+md/
 
