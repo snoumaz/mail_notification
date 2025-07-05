@@ -478,9 +478,35 @@ htop
 
 ### 2. Monitorear Logs
 
+```bash
+# Ver logs en tiempo real
+sudo journalctl -u email-monitor.service -f
+
+# Ver logs de las últimas 100 líneas
+sudo journalctl -u email-monitor.service -n 100
+
+# Ver logs desde el inicio
+sudo journalctl -u email-monitor.service --since "2024-01-01"
 ```
 
+### 3. Solución de Problemas
+
+Si el servicio no funciona correctamente, consulta la [Guía de Solución de Problemas](./solucion_problemas_systemd.md) para diagnóstico y solución de errores comunes.
+
+**Comandos rápidos de diagnóstico:**
+
+```bash
+# Diagnóstico automático
+python src/utils/setup.py diagnose
+
+# Verificar configuración del servicio
+sudo systemctl status email-monitor.service
+
+# Ver logs detallados
+sudo journalctl -u email-monitor.service -n 50 --no-pager
 ```
+
+````
 
 ## ⚡ Comandos Útiles
 
@@ -506,6 +532,6 @@ NOTIFY_DOMAINS=gmail.com,hotmail.com
 LABEL_CANDIDATES=Urgente,Importante,Otros
 LOG_LEVEL=INFO
 DAILY_SUMMARY_TIME=21:00
-```
+````
 
 ---

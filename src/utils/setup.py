@@ -32,17 +32,46 @@ class SetupManager:
         """Instala las dependencias del proyecto"""
         try:
             print("📦 Instalando dependencias...")
-            subprocess.run(
-                [
-                    sys.executable,
-                    "-m",
-                    "pip",
-                    "install",
-                    "-r",
-                    str(self.project_root / "requirements.txt"),
-                ],
-                check=True,
-            )
+
+            # Verificar si existe un entorno virtual
+            venv_path = self.project_root / "venv"
+            if not venv_path.exists():
+                print("🔧 Creando entorno virtual...")
+                subprocess.run(
+                    [sys.executable, "-m", "venv", str(venv_path)],
+                    check=True,
+                )
+                print("✅ Entorno virtual creado")
+
+            # Instalar dependencias en el entorno virtual
+            pip_path = venv_path / "bin" / "pip"
+            if not pip_path.exists():
+                pip_path = venv_path / "Scripts" / "pip.exe"  # Windows
+
+            if pip_path.exists():
+                subprocess.run(
+                    [
+                        str(pip_path),
+                        "install",
+                        "-r",
+                        str(self.project_root / "requirements.txt"),
+                    ],
+                    check=True,
+                )
+            else:
+                # Fallback: instalar globalmente
+                subprocess.run(
+                    [
+                        sys.executable,
+                        "-m",
+                        "pip",
+                        "install",
+                        "-r",
+                        str(self.project_root / "requirements.txt"),
+                    ],
+                    check=True,
+                )
+
             print("✅ Dependencias instaladas correctamente")
             return True
         except subprocess.CalledProcessError as e:
@@ -168,9 +197,10 @@ class SetupManager:
         try:
             print("🧪 Ejecutando pruebas...")
             result = subprocess.run(
-                [sys.executable, "-m", "pytest", "tests/test_main.py", "-v"],
+                [sys.executable, "-m", "pytest", "tests/", "-v"],
                 capture_output=True,
                 text=True,
+                cwd=self.project_root,
             )
 
             if result.returncode == 0:
@@ -193,6 +223,7 @@ class SetupManager:
                 [sys.executable, str(self.project_root / "main.py"), "test_telegram"],
                 capture_output=True,
                 text=True,
+                cwd=self.project_root,
             )
 
             if result.returncode == 0:
@@ -206,21 +237,94 @@ class SetupManager:
             print(f"❌ Error probando Telegram: {e}")
             return False
 
+    def diagnose_systemd_service(self) -> bool:
+        """Diagnostica problemas con el servicio systemd"""
+        try:
+            print("🔍 Diagnosticando servicio systemd...")
+
+            # Verificar si el servicio existe
+            result = subprocess.run(
+                ["systemctl", "status", "email-monitor.service"],
+                capture_output=True,
+                text=True,
+            )
+
+            if result.returncode == 0:
+                print("✅ El servicio existe y está configurado")
+            else:
+                print("❌ El servicio no existe o no está configurado correctamente")
+
+            # Verificar logs del servicio
+            print("\n📋 Últimos logs del servicio:")
+            subprocess.run(["journalctl", "-u", "email-monitor.service", "-n", "20"])
+
+            # Verificar archivo del servicio
+            service_file = "/etc/systemd/system/email-monitor.service"
+            if os.path.exists(service_file):
+                print(f"\n📄 Contenido del archivo de servicio:")
+                with open(service_file, "r") as f:
+                    print(f.read())
+            else:
+                print(f"❌ El archivo {service_file} no existe")
+
+            return True
+        except Exception as e:
+            print(f"❌ Error diagnosticando servicio: {e}")
+            return False
+
     def create_systemd_service(self) -> bool:
         """Crea un servicio systemd para el monitor"""
         try:
+            # Verificar que existe el entorno virtual
+            venv_path = self.project_root / "venv"
+            if not venv_path.exists():
+                print(
+                    "❌ Error: No se encontró el entorno virtual. Ejecuta primero la instalación de dependencias."
+                )
+                return False
+
+            # Determinar la ruta del Python del entorno virtual
+            python_path = venv_path / "bin" / "python"
+            if not python_path.exists():
+                python_path = venv_path / "Scripts" / "python.exe"  # Windows
+
+            if not python_path.exists():
+                print("❌ Error: No se pudo encontrar Python en el entorno virtual")
+                return False
+
+            # Obtener el usuario actual
+            current_user = os.getenv("USER", "root")
+            if current_user == "root":
+                current_user = input(
+                    "Usuario para ejecutar el servicio (ej: emailmonitor): "
+                ).strip()
+                if not current_user:
+                    print("❌ Error: Se requiere especificar un usuario")
+                    return False
+
             service_content = f"""[Unit]
 Description=Email Monitor Service
 After=network.target
+Wants=network.target
 
 [Service]
 Type=simple
-User={os.getenv('USER', 'root')}
+User={current_user}
+Group={current_user}
 WorkingDirectory={self.project_root}
-Environment=PATH={self.project_root}/venv/bin
-ExecStart={self.project_root}/venv/bin/python main.py
+Environment=PATH={venv_path}/bin
+ExecStart={python_path} main.py
 Restart=always
 RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Configuración de seguridad
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths={self.project_root}/logs {self.project_root}/data
 
 [Install]
 WantedBy=multi-user.target
@@ -232,18 +336,42 @@ WantedBy=multi-user.target
                 f"¿Deseas crear el servicio systemd en {service_file}? (y/N): "
             )
             if response.lower() == "y":
-                # Requiere permisos de sudo
-                with open("/tmp/email-monitor.service", "w") as f:
+                # Crear archivo temporal
+                temp_file = self.project_root / "email-monitor.service.tmp"
+                with open(temp_file, "w") as f:
                     f.write(service_content)
 
+                # Copiar con sudo
+                subprocess.run(["sudo", "cp", str(temp_file), service_file], check=True)
+                subprocess.run(["sudo", "chown", "root:root", service_file], check=True)
+                subprocess.run(["sudo", "chmod", "644", service_file], check=True)
+
+                # Configurar permisos del directorio
                 subprocess.run(
-                    ["sudo", "cp", "/tmp/email-monitor.service", service_file]
+                    [
+                        "sudo",
+                        "chown",
+                        "-R",
+                        f"{current_user}:{current_user}",
+                        str(self.project_root),
+                    ],
+                    check=True,
                 )
-                subprocess.run(["sudo", "systemctl", "daemon-reload"])
-                subprocess.run(["sudo", "systemctl", "enable", "email-monitor.service"])
+
+                # Recargar systemd
+                subprocess.run(["sudo", "systemctl", "daemon-reload"], check=True)
+                subprocess.run(
+                    ["sudo", "systemctl", "enable", "email-monitor.service"], check=True
+                )
+
+                # Limpiar archivo temporal
+                temp_file.unlink(missing_ok=True)
 
                 print("✅ Servicio systemd creado y habilitado")
-                print("Para iniciar el servicio: sudo systemctl start email-monitor")
+                print(f"📋 Comandos útiles:")
+                print(f"  - Iniciar: sudo systemctl start email-monitor.service")
+                print(f"  - Estado: sudo systemctl status email-monitor.service")
+                print(f"  - Logs: sudo journalctl -u email-monitor.service -f")
                 return True
             else:
                 print("📝 Servicio systemd no creado")
@@ -306,9 +434,11 @@ def main():
             setup.setup_configuration()
         elif command == "groups":
             setup.setup_sender_groups()
+        elif command == "diagnose":
+            setup.diagnose_systemd_service()
         else:
             print(f"Comando desconocido: {command}")
-            print("Comandos disponibles: test, telegram, config, groups")
+            print("Comandos disponibles: test, telegram, config, groups, diagnose")
             sys.exit(1)
     else:
         setup.run_setup()
