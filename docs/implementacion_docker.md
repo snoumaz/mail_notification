@@ -29,14 +29,14 @@
 
 ```bash
 git clone https://github.com/dav-tech-work/mail_notification.git
-cd organizador
+cd mail_notification
 ```
 
 2. Crea los archivos de configuración necesarios:
 
 ```bash
 cp config.example .env
-cp sender_groups_exemple.json sender_groups.json
+# El archivo sender_groups.json ya existe en el repositorio
 ```
 
 ---
@@ -89,16 +89,10 @@ LOG_LEVEL=INFO
 
 ## 🚀 Despliegue con Docker
 
-1. Ve al directorio `docker`:
+1. Construye y levanta el servicio:
 
 ```bash
-cd docker
-```
-
-2. Construye y levanta el servicio:
-
-```bash
-docker compose up --build -d
+docker compose -f docker/docker-compose.yml up --build -d
 ```
 
 Esto creará el contenedor, instalará dependencias y ejecutará el monitor automáticamente.
@@ -121,16 +115,16 @@ docker logs organizador_email_monitor
 
 - **Reiniciar el servicio:**
   ```bash
-  docker compose restart
+  docker compose -f docker/docker-compose.yml restart
   ```
 - **Detener el servicio:**
   ```bash
-  docker compose down
+  docker compose -f docker/docker-compose.yml down
   ```
 - **Actualizar el código:**
   ```bash
   git pull origin main
-  docker compose up --build -d
+  docker compose -f docker/docker-compose.yml up --build -d
   ```
 - **Ver logs en tiempo real:**
   ```bash
@@ -183,14 +177,14 @@ DAILY_SUMMARY_TIME=21:00
 
 ## ⚡ Comandos Útiles
 
-| Acción                       | Comando                                                                            |
-| ---------------------------- | ---------------------------------------------------------------------------------- |
-| Ejecutar monitor principal   | `docker compose up -d`                                                             |
-| Ver logs                     | `docker logs -f organizador_email_monitor`                                         |
-| Probar notificación Telegram | `docker exec -it organizador_email_monitor python main.py test_telegram`           |
-| Probar clasificación IA      | `docker exec -it organizador_email_monitor python main.py test_classify`           |
-| Ejecutar tests               | `docker exec -it organizador_email_monitor python -m pytest tests/test_main.py -v` |
-| Enviar resumen diario manual | `docker exec -it organizador_email_monitor python main.py send_summary`            |
+| Acción                       | Comando                                                                  |
+| ---------------------------- | ------------------------------------------------------------------------ |
+| Ejecutar monitor principal   | `docker compose -f docker/docker-compose.yml up -d`                      |
+| Ver logs                     | `docker logs -f organizador_email_monitor`                               |
+| Probar notificación Telegram | `docker exec -it organizador_email_monitor python main.py test_telegram` |
+| Probar clasificación IA      | `docker exec -it organizador_email_monitor python main.py test_classify` |
+| Ejecutar tests               | `docker exec -it organizador_email_monitor python -m pytest tests/ -v`   |
+| Enviar resumen diario manual | `docker exec -it organizador_email_monitor python main.py send_summary`  |
 
 ---
 

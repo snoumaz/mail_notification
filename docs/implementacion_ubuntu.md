@@ -235,13 +235,13 @@ cd ~
 
 # Clonar el repositorio
 git clone https://github.com/dav-tech-work/mail_notification.git
-cd organizador
+cd mail_notification
 
 # Verificar que se clonó correctamente
 ls -la
 
 # Verificar archivos principales
-ls -la main.py email_monitor.py logging_config.py setup.py
+ls -la main.py config.example sender_groups.json
 ```
 
 ### 2. Crear Entorno Virtual
@@ -288,13 +288,28 @@ ls -la
 
 ```bash
 # Ejecutar script de configuración
-python setup.py
+python src/utils/setup.py
 ```
 
 El script te guiará a través de:
 
 - Configuración de variables de entorno
 - Configuración de grupos de remitentes
+- Pruebas de conexión
+- Creación del servicio systemd
+
+### 2. Configuración Manual
+
+```bash
+# Crear archivo de configuración
+cp config.example .env
+nano .env
+```
+
+Configura manualmente:
+
+- Variables de entorno en el archivo `.env`
+- Grupos de remitentes en `sender_groups.json`
 - Pruebas de conexión
 - Creación del servicio systemd
 
@@ -359,7 +374,7 @@ python main.py test_telegram
 python main.py test_classify
 
 # Ejecutar pruebas completas
-python -m pytest test_main.py -v
+python -m pytest tests/ -v
 ```
 
 ---
@@ -385,9 +400,9 @@ Wants=network.target
 Type=simple
 User=emailmonitor
 Group=emailmonitor
-WorkingDirectory=/home/emailmonitor/organizador
-Environment=PATH=/home/emailmonitor/organizador/venv/bin
-ExecStart=/home/emailmonitor/organizador/venv/bin/python main.py
+WorkingDirectory=/home/emailmonitor/mail_notification
+Environment=PATH=/home/emailmonitor/mail_notification/venv/bin
+ExecStart=/home/emailmonitor/mail_notification/venv/bin/python main.py
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -398,7 +413,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/home/emailmonitor/organizador/logs /home/emailmonitor/organizador/data
+ReadWritePaths=/home/emailmonitor/mail_notification/logs /home/emailmonitor/mail_notification/data
 
 [Install]
 WantedBy=multi-user.target
@@ -408,11 +423,11 @@ WantedBy=multi-user.target
 
 ```bash
 # Ajustar permisos del directorio
-sudo chown -R emailmonitor:emailmonitor /home/emailmonitor/organizador
+sudo chown -R emailmonitor:emailmonitor /home/emailmonitor/mail_notification
 
 # Dar permisos de escritura a logs y data
-sudo chmod 755 /home/emailmonitor/organizador/logs
-sudo chmod 755 /home/emailmonitor/organizador/data
+sudo chmod 755 /home/emailmonitor/mail_notification/logs
+sudo chmod 755 /home/emailmonitor/mail_notification/data
 ```
 
 ### 3. Habilitar y Iniciar el Servicio
@@ -469,13 +484,13 @@ htop
 
 ## ⚡ Comandos Útiles
 
-| Acción                       | Comando                                  |
-| ---------------------------- | ---------------------------------------- |
-| Ejecutar monitor principal   | `python main.py`                         |
-| Probar notificación Telegram | `python main.py test_telegram`           |
-| Probar clasificación IA      | `python main.py test_classify`           |
-| Ejecutar tests               | `python -m pytest tests/test_main.py -v` |
-| Enviar resumen diario manual | `python main.py send_summary`            |
+| Acción                       | Comando                        |
+| ---------------------------- | ------------------------------ |
+| Ejecutar monitor principal   | `python main.py`               |
+| Probar notificación Telegram | `python main.py test_telegram` |
+| Probar clasificación IA      | `python main.py test_classify` |
+| Ejecutar tests               | `python -m pytest tests/ -v`   |
+| Enviar resumen diario manual | `python main.py send_summary`  |
 
 ---
 

@@ -48,7 +48,7 @@ docker exec -it organizador_email_monitor python main.py send_summary
 | Ejecutar monitor principal   | `python main.py`                                                        |
 | Probar notificación Telegram | `python main.py test_telegram`                                          |
 | Probar clasificación IA      | `python main.py test_classify`                                          |
-| Ejecutar tests               | `python -m pytest tests/test_main.py -v`                                |
+| Ejecutar tests               | `python -m pytest tests/ -v`                                            |
 | Enviar resumen diario manual | `python main.py send_summary`                                           |
 | Resumen manual en Docker     | `docker exec -it organizador_email_monitor python main.py send_summary` |
 
@@ -126,8 +126,8 @@ DAILY_SUMMARY_TIME=21:00
 
 ### 🔧 Configuración Avanzada
 
-- **Script de instalación automatizada**: `setup.py` para configuración guiada
-- **Logging con rotación**: Sistema de logs avanzado con `logging_config.py`
+- **Script de instalación automatizada**: `src/utils/setup.py` para configuración guiada
+- **Logging con rotación**: Sistema de logs avanzado con `src/core/logging_config.py`
 - **Variables de entorno opcionales**: Configuración flexible
 - **Configuración Docker mejorada**: Build local y usuario no-root
 

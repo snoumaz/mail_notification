@@ -10,6 +10,7 @@ TELEGRAM_CHAT_ID=tu_chat_id
 # Configuración opcional
 NOTIFY_DOMAINS=gmail.com,hotmail.com,outlook.com
 LABEL_CANDIDATES=Urgente,Importante,Otros
+LOG_LEVEL=INFO
 
 # Configuración del scheduler (opcional)
 DAILY_SUMMARY_TIME=21:00
