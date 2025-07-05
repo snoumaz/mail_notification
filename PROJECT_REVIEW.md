@@ -362,4 +362,8 @@ El proyecto demuestra un alto nivel de calidad técnica y está bien preparado p
 3. Considerar la implementación de un dashboard web
 4. Evaluar la adición de métricas de performance
 
+<<<<<<< HEAD
 **Tiempo estimado para mejoras:** 2-3 días de desarrollo adicional para implementar las mejoras prioritarias.
+=======
+**Tiempo estimado para mejoras:** 2-3 días de desarrollo adicional para implementar las mejoras prioritarias.
+>>>>>>> e005211167595a977bd48a5de5c490387319132d

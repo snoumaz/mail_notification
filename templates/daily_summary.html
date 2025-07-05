@@ -216,7 +216,11 @@
             <h1>📊 Resumen Diario de Correos</h1>
             <div class="date">{{ date }}</div>
         </div>
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         <div class="content">
             <!-- Estadísticas principales -->
             <div class="stats-grid">
@@ -237,7 +241,11 @@
                     <div class="stat-label">Hora Más Activa</div>
                 </div>
             </div>
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             <!-- Sección principal con dos columnas -->
             <div class="flex-container">
                 <!-- Top Remitentes -->
@@ -257,7 +265,11 @@
                         {% endif %}
                     </div>
                 </div>
+<<<<<<< HEAD
 
+=======
+                
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
                 <!-- Categorías -->
                 <div class="flex-item">
                     <div class="card categories">
@@ -279,7 +291,11 @@
                     </div>
                 </div>
             </div>
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             <!-- Grupos de remitentes -->
             <div class="section">
                 <div class="card groups">
@@ -309,7 +325,11 @@
                     </div>
                 </div>
             </div>
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             <!-- Actividad por horas -->
             {% if hourly_activity %}
             <div class="section">
@@ -319,7 +339,11 @@
                     </div>
                     <div class="hourly-activity">
                         {% for hour in range(8, 20) %}
+<<<<<<< HEAD
                         <div class="hour-bar {% if hourly_activity.get(hour|string, 0) > 0 %}active{% endif %}"
+=======
+                        <div class="hour-bar {% if hourly_activity.get(hour|string, 0) > 0 %}active{% endif %}" 
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
                              title="{{ hour }}:00 - {{ hourly_activity.get(hour|string, 0) }} correos">
                             <small>{{ hour }}</small>
                         </div>
@@ -331,7 +355,11 @@
                 </div>
             </div>
             {% endif %}
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             <!-- Estadísticas adicionales -->
             {% if total_attachments or avg_body_length %}
             <div class="section">
@@ -368,7 +396,11 @@
                 </div>
             </div>
             {% endif %}
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             <!-- Top dominios -->
             {% if domains %}
             <div class="section">
@@ -386,7 +418,11 @@
             </div>
             {% endif %}
         </div>
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         <div class="footer">
             <div class="footer-text">
                 🤖 Resumen generado automáticamente por Gmail Bot Avanzado<br>
@@ -396,4 +432,8 @@
         </div>
     </div>
 </body>
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> e005211167595a977bd48a5de5c490387319132d

@@ -9,11 +9,19 @@ import os
 
 class EmailScheduler:
     """Programador de tareas para el bot de Gmail"""
+<<<<<<< HEAD
 
     def __init__(self, gmail_client, email_sender, daily_summary, telegram_notifier):
         """
         Inicializa el programador de tareas
 
+=======
+    
+    def __init__(self, gmail_client, email_sender, daily_summary, telegram_notifier):
+        """
+        Inicializa el programador de tareas
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Args:
             gmail_client: Cliente Gmail API
             email_sender: Módulo de envío de correos
@@ -27,20 +35,31 @@ class EmailScheduler:
         self.logger = logging.getLogger(__name__)
         self.running = False
         self.email_processor = None
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         # Configuración desde variables de entorno
         self.daily_summary_time = os.getenv("DAILY_SUMMARY_TIME", "21:00")
         self.check_interval = int(os.getenv("CHECK_INTERVAL", "120"))  # segundos
         self.cleanup_days = int(os.getenv("CLEANUP_DAYS", "30"))
         self.summary_email_recipient = os.getenv("SUMMARY_EMAIL_RECIPIENT")
+<<<<<<< HEAD
 
         self._setup_schedules()
 
+=======
+        
+        self._setup_schedules()
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def _setup_schedules(self):
         """Configura todas las tareas programadas"""
         try:
             # Resumen diario a la hora especificada
             schedule.every().day.at(self.daily_summary_time).do(self._run_daily_summary)
+<<<<<<< HEAD
 
             # Limpieza de base de datos semanal (domingos a medianoche)
             schedule.every().sunday.at("00:00").do(self._run_cleanup)
@@ -51,11 +70,24 @@ class EmailScheduler:
             # Verificación de salud del sistema cada hora
             schedule.every().hour.do(self._run_health_check)
 
+=======
+            
+            # Limpieza de base de datos semanal (domingos a medianoche)
+            schedule.every().sunday.at("00:00").do(self._run_cleanup)
+            
+            # Resumen semanal (domingos a las 22:00)
+            schedule.every().sunday.at("22:00").do(self._run_weekly_summary)
+            
+            # Verificación de salud del sistema cada hora
+            schedule.every().hour.do(self._run_health_check)
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             self.logger.info(f"Tareas programadas configuradas:")
             self.logger.info(f"  - Resumen diario: {self.daily_summary_time}")
             self.logger.info(f"  - Procesamiento de correos: cada {self.check_interval} segundos")
             self.logger.info(f"  - Limpieza de datos: domingos 00:00")
             self.logger.info(f"  - Resumen semanal: domingos 22:00")
+<<<<<<< HEAD
 
         except Exception as e:
             self.logger.error(f"Error configurando tareas programadas: {e}")
@@ -64,27 +96,52 @@ class EmailScheduler:
         """
         Establece la función de procesamiento de correos
 
+=======
+            
+        except Exception as e:
+            self.logger.error(f"Error configurando tareas programadas: {e}")
+    
+    def set_email_processor(self, processor: Callable):
+        """
+        Establece la función de procesamiento de correos
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Args:
             processor (callable): Función que procesa correos nuevos
         """
         self.email_processor = processor
         self.logger.info("Procesador de correos configurado")
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def start(self):
         """Inicia el programador de tareas"""
         if self.running:
             self.logger.warning("El programador ya está ejecutándose")
             return
+<<<<<<< HEAD
 
         self.running = True
         self.logger.info("🚀 Iniciando programador de tareas...")
 
+=======
+        
+        self.running = True
+        self.logger.info("🚀 Iniciando programador de tareas...")
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         # Iniciar hilo de procesamiento de correos
         if self.email_processor:
             email_thread = Thread(target=self._email_processing_loop, daemon=True)
             email_thread.start()
             self.logger.info(f"Procesamiento de correos iniciado (intervalo: {self.check_interval}s)")
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         # Loop principal del scheduler
         try:
             while self.running:
@@ -94,13 +151,21 @@ class EmailScheduler:
             self.logger.info("Programador detenido por el usuario")
         finally:
             self.stop()
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def stop(self):
         """Detiene el programador de tareas"""
         self.running = False
         schedule.clear()
         self.logger.info("🛑 Programador de tareas detenido")
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def _email_processing_loop(self):
         """Loop de procesamiento de correos en hilo separado"""
         while self.running:
@@ -111,11 +176,16 @@ class EmailScheduler:
             except Exception as e:
                 self.logger.error(f"Error en procesamiento de correos: {e}")
                 time.sleep(60)  # Esperar 1 minuto antes de reintentar
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def _run_daily_summary(self):
         """Ejecuta la generación y envío del resumen diario"""
         try:
             self.logger.info("📊 Iniciando generación de resumen diario...")
+<<<<<<< HEAD
 
             # Generar resumen
             summary = self.daily_summary.generate_daily_summary()
@@ -124,13 +194,27 @@ class EmailScheduler:
                 # Enviar por Telegram
                 telegram_success = self._send_telegram_summary(summary)
 
+=======
+            
+            # Generar resumen
+            summary = self.daily_summary.generate_daily_summary()
+            
+            if summary:
+                # Enviar por Telegram
+                telegram_success = self._send_telegram_summary(summary)
+                
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
                 # Enviar por email si está configurado
                 email_success = False
                 if self.summary_email_recipient:
                     email_success = self.email_sender.send_daily_summary_email(
                         summary, self.summary_email_recipient
                     )
+<<<<<<< HEAD
 
+=======
+                
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
                 # Marcar como enviado si al menos uno fue exitoso
                 if telegram_success or email_success:
                     self.daily_summary.mark_summary_sent(summary['date'])
@@ -139,14 +223,22 @@ class EmailScheduler:
                     self.logger.error("❌ Error enviando resumen diario")
             else:
                 self.logger.info("ℹ️ No hay correos para el resumen diario")
+<<<<<<< HEAD
 
         except Exception as e:
             self.logger.error(f"Error en resumen diario: {e}")
 
+=======
+                
+        except Exception as e:
+            self.logger.error(f"Error en resumen diario: {e}")
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def _run_weekly_summary(self):
         """Ejecuta la generación y envío del resumen semanal"""
         try:
             self.logger.info("📅 Iniciando generación de resumen semanal...")
+<<<<<<< HEAD
 
             # Generar resumen semanal
             weekly_summary = self.daily_summary.get_weekly_summary()
@@ -155,42 +247,77 @@ class EmailScheduler:
                 # Enviar por Telegram
                 telegram_success = self._send_telegram_weekly_summary(weekly_summary)
 
+=======
+            
+            # Generar resumen semanal
+            weekly_summary = self.daily_summary.get_weekly_summary()
+            
+            if weekly_summary:
+                # Enviar por Telegram
+                telegram_success = self._send_telegram_weekly_summary(weekly_summary)
+                
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
                 # Enviar por email si está configurado
                 email_success = False
                 if self.summary_email_recipient:
                     email_success = self.email_sender.send_weekly_summary_email(
                         weekly_summary, self.summary_email_recipient
                     )
+<<<<<<< HEAD
 
+=======
+                
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
                 if telegram_success or email_success:
                     self.logger.info(f"✅ Resumen semanal enviado - {weekly_summary['total_emails']} correos")
                 else:
                     self.logger.error("❌ Error enviando resumen semanal")
             else:
                 self.logger.info("ℹ️ No hay datos para el resumen semanal")
+<<<<<<< HEAD
 
         except Exception as e:
             self.logger.error(f"Error en resumen semanal: {e}")
 
+=======
+                
+        except Exception as e:
+            self.logger.error(f"Error en resumen semanal: {e}")
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def _run_cleanup(self):
         """Ejecuta la limpieza de datos antiguos"""
         try:
             self.logger.info("🧹 Iniciando limpieza de datos antiguos...")
+<<<<<<< HEAD
 
             success = self.daily_summary.cleanup_old_data(self.cleanup_days)
 
+=======
+            
+            success = self.daily_summary.cleanup_old_data(self.cleanup_days)
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             if success:
                 self.logger.info(f"✅ Limpieza completada - datos anteriores a {self.cleanup_days} días eliminados")
             else:
                 self.logger.error("❌ Error en limpieza de datos")
+<<<<<<< HEAD
 
         except Exception as e:
             self.logger.error(f"Error en limpieza de datos: {e}")
 
+=======
+                
+        except Exception as e:
+            self.logger.error(f"Error en limpieza de datos: {e}")
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def _run_health_check(self):
         """Ejecuta verificación de salud del sistema"""
         try:
             self.logger.debug("🔍 Ejecutando verificación de salud...")
+<<<<<<< HEAD
 
             # Verificar conexión Gmail API
             gmail_healthy = self._check_gmail_health()
@@ -201,6 +328,18 @@ class EmailScheduler:
             # Verificar Telegram
             telegram_healthy = self._check_telegram_health()
 
+=======
+            
+            # Verificar conexión Gmail API
+            gmail_healthy = self._check_gmail_health()
+            
+            # Verificar base de datos
+            db_healthy = self._check_database_health()
+            
+            # Verificar Telegram
+            telegram_healthy = self._check_telegram_health()
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             # Log del estado general
             if gmail_healthy and db_healthy and telegram_healthy:
                 self.logger.debug("✅ Sistema saludable")
@@ -211,10 +350,17 @@ class EmailScheduler:
                     'telegram': telegram_healthy
                 }
                 self.logger.warning(f"⚠️ Problemas de salud detectados: {health_status}")
+<<<<<<< HEAD
 
         except Exception as e:
             self.logger.error(f"Error en verificación de salud: {e}")
 
+=======
+                
+        except Exception as e:
+            self.logger.error(f"Error en verificación de salud: {e}")
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def _check_gmail_health(self) -> bool:
         """Verifica la salud de la conexión Gmail API"""
         try:
@@ -223,7 +369,11 @@ class EmailScheduler:
         except Exception as e:
             self.logger.warning(f"Gmail API no saludable: {e}")
             return False
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def _check_database_health(self) -> bool:
         """Verifica la salud de la base de datos"""
         try:
@@ -232,7 +382,11 @@ class EmailScheduler:
         except Exception as e:
             self.logger.warning(f"Base de datos no saludable: {e}")
             return False
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def _check_telegram_health(self) -> bool:
         """Verifica la salud de la conexión Telegram"""
         try:
@@ -242,6 +396,7 @@ class EmailScheduler:
         except Exception as e:
             self.logger.warning(f"Telegram no saludable: {e}")
             return False
+<<<<<<< HEAD
 
     def _send_telegram_summary(self, summary: Dict) -> bool:
         """
@@ -250,13 +405,27 @@ class EmailScheduler:
         Args:
             summary (dict): Resumen diario
 
+=======
+    
+    def _send_telegram_summary(self, summary: Dict) -> bool:
+        """
+        Envía resumen por Telegram
+        
+        Args:
+            summary (dict): Resumen diario
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Returns:
             bool: True si se envió exitosamente
         """
         try:
             # Crear mensaje formateado para Telegram
             message = self._format_telegram_summary(summary)
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             # Enviar usando el notificador de Telegram
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
@@ -264,6 +433,7 @@ class EmailScheduler:
                 self.telegram_notifier.send_daily_summary(message)
             )
             loop.close()
+<<<<<<< HEAD
 
             return result
 
@@ -278,13 +448,33 @@ class EmailScheduler:
         Args:
             summary (dict): Resumen semanal
 
+=======
+            
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Error enviando resumen por Telegram: {e}")
+            return False
+    
+    def _send_telegram_weekly_summary(self, summary: Dict) -> bool:
+        """
+        Envía resumen semanal por Telegram
+        
+        Args:
+            summary (dict): Resumen semanal
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Returns:
             bool: True si se envió exitosamente
         """
         try:
             # Crear mensaje formateado para Telegram
             message = self._format_telegram_weekly_summary(summary)
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             # Enviar usando el notificador de Telegram
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
@@ -292,6 +482,7 @@ class EmailScheduler:
                 self.telegram_notifier.send_weekly_summary(message)
             )
             loop.close()
+<<<<<<< HEAD
 
             return result
 
@@ -306,6 +497,22 @@ class EmailScheduler:
         Args:
             summary (dict): Resumen diario
 
+=======
+            
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Error enviando resumen semanal por Telegram: {e}")
+            return False
+    
+    def _format_telegram_summary(self, summary: Dict) -> str:
+        """
+        Formatea resumen diario para Telegram
+        
+        Args:
+            summary (dict): Resumen diario
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Returns:
             str: Mensaje formateado
         """
@@ -315,10 +522,17 @@ class EmailScheduler:
             senders_text = "\n".join([
                 f"  • {sender}: {count}" for sender, count in top_senders
             ])
+<<<<<<< HEAD
 
             # Categorías
             classifications = summary.get('classifications', {})
 
+=======
+            
+            # Categorías
+            classifications = summary.get('classifications', {})
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             message = f"""📊 **Resumen Diario** - {summary.get('date', 'N/A')}
 
 📈 **Estadísticas:**
@@ -336,11 +550,16 @@ class EmailScheduler:
 • Otros: {classifications.get('Otros', 0)}
 
 👥 **Grupos Activos:**"""
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             # Grupos de remitentes
             for group, count in summary.get('sender_groups', {}).items():
                 if count > 0:
                     message += f"\n• {group}: {count}"
+<<<<<<< HEAD
 
             return message
 
@@ -355,6 +574,22 @@ class EmailScheduler:
         Args:
             summary (dict): Resumen semanal
 
+=======
+            
+            return message
+            
+        except Exception as e:
+            self.logger.error(f"Error formateando resumen para Telegram: {e}")
+            return f"Error generando resumen para {summary.get('date', 'N/A')}"
+    
+    def _format_telegram_weekly_summary(self, summary: Dict) -> str:
+        """
+        Formatea resumen semanal para Telegram
+        
+        Args:
+            summary (dict): Resumen semanal
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Returns:
             str: Mensaje formateado
         """
@@ -370,6 +605,7 @@ class EmailScheduler:
 • Día más activo: {summary.get('busiest_day', 'N/A')}
 
 📈 **Actividad Diaria:**"""
+<<<<<<< HEAD
 
             # Desglose diario
             for day_data in summary.get('daily_breakdown', []):
@@ -381,26 +617,55 @@ class EmailScheduler:
             self.logger.error(f"Error formateando resumen semanal para Telegram: {e}")
             return f"Error generando resumen semanal"
 
+=======
+            
+            # Desglose diario
+            for day_data in summary.get('daily_breakdown', []):
+                message += f"\n• {day_data['date']}: {day_data['total_emails']} correos"
+            
+            return message
+            
+        except Exception as e:
+            self.logger.error(f"Error formateando resumen semanal para Telegram: {e}")
+            return f"Error generando resumen semanal"
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def trigger_daily_summary(self):
         """Dispara manualmente la generación del resumen diario"""
         self.logger.info("Ejecutando resumen diario manualmente...")
         self._run_daily_summary()
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def trigger_cleanup(self):
         """Dispara manualmente la limpieza de datos"""
         self.logger.info("Ejecutando limpieza de datos manualmente...")
         self._run_cleanup()
+<<<<<<< HEAD
 
     def get_schedule_info(self) -> Dict:
         """
         Obtiene información sobre las tareas programadas
 
+=======
+    
+    def get_schedule_info(self) -> Dict:
+        """
+        Obtiene información sobre las tareas programadas
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Returns:
             dict: Información de las tareas
         """
         try:
             jobs = schedule.jobs
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             schedule_info = {
                 'total_jobs': len(jobs),
                 'daily_summary_time': self.daily_summary_time,
@@ -410,7 +675,11 @@ class EmailScheduler:
                 'running': self.running,
                 'next_runs': []
             }
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             # Obtener próximas ejecuciones
             for job in jobs:
                 try:
@@ -421,6 +690,7 @@ class EmailScheduler:
                     })
                 except:
                     pass
+<<<<<<< HEAD
 
             return schedule_info
 
@@ -432,6 +702,19 @@ class EmailScheduler:
         """
         Obtiene estadísticas del scheduler
 
+=======
+            
+            return schedule_info
+            
+        except Exception as e:
+            self.logger.error(f"Error obteniendo información de programación: {e}")
+            return {'error': str(e)}
+    
+    def get_stats(self) -> Dict:
+        """
+        Obtiene estadísticas del scheduler
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Returns:
             dict: Estadísticas del scheduler
         """
@@ -443,4 +726,8 @@ class EmailScheduler:
             'email_notifications_enabled': self.summary_email_recipient is not None,
             'total_scheduled_jobs': len(schedule.jobs),
             'email_processor_set': self.email_processor is not None
+<<<<<<< HEAD
         }
+=======
+        }
+>>>>>>> e005211167595a977bd48a5de5c490387319132d

@@ -7,24 +7,40 @@ import os
 
 class DailySummary:
     """Generador de resúmenes diarios de correos"""
+<<<<<<< HEAD
 
     def __init__(self, db_path: str = "email_stats.db"):
         """
         Inicializa el gestor de resúmenes diarios
 
+=======
+    
+    def __init__(self, db_path: str = "email_stats.db"):
+        """
+        Inicializa el gestor de resúmenes diarios
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Args:
             db_path (str): Ruta a la base de datos SQLite
         """
         self.db_path = db_path
         self.logger = logging.getLogger(__name__)
         self._init_database()
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def _init_database(self):
         """Inicializa la base de datos para estadísticas"""
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             # Tabla principal de estadísticas de correos
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS email_stats (
@@ -44,7 +60,11 @@ class DailySummary:
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             # Tabla para estadísticas diarias consolidadas
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS daily_stats (
@@ -61,12 +81,17 @@ class DailySummary:
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             # Índices para mejorar el rendimiento
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_date ON email_stats(date)')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_message_id ON email_stats(message_id)')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_sender ON email_stats(sender)')
             cursor.execute('CREATE INDEX IF NOT EXISTS idx_classification ON email_stats(classification)')
+<<<<<<< HEAD
 
             conn.commit()
             conn.close()
@@ -84,6 +109,25 @@ class DailySummary:
         """
         Registra un correo en las estadísticas
 
+=======
+            
+            conn.commit()
+            conn.close()
+            
+            self.logger.info("Base de datos inicializada correctamente")
+            
+        except sqlite3.Error as e:
+            self.logger.error(f"Error inicializando base de datos: {e}")
+            raise
+    
+    def record_email(self, sender: str, recipient: str, subject: str, 
+                    classification: str, sender_group: str, priority: str,
+                    message_id: str, has_attachments: bool = False, 
+                    body_length: int = 0) -> bool:
+        """
+        Registra un correo en las estadísticas
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Args:
             sender (str): Remitente del correo
             recipient (str): Destinatario del correo
@@ -94,13 +138,18 @@ class DailySummary:
             message_id (str): ID único del mensaje
             has_attachments (bool): Si tiene archivos adjuntos
             body_length (int): Longitud del cuerpo del mensaje
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Returns:
             bool: True si se registró exitosamente
         """
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
+<<<<<<< HEAD
 
             now = datetime.now()
             sender_domain = self._extract_domain(sender)
@@ -109,6 +158,16 @@ class DailySummary:
                 INSERT OR REPLACE INTO email_stats
                 (date, time, sender, sender_domain, recipient, subject,
                  classification, sender_group, priority, message_id,
+=======
+            
+            now = datetime.now()
+            sender_domain = self._extract_domain(sender)
+            
+            cursor.execute('''
+                INSERT OR REPLACE INTO email_stats 
+                (date, time, sender, sender_domain, recipient, subject, 
+                 classification, sender_group, priority, message_id, 
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
                  has_attachments, body_length)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
@@ -125,6 +184,7 @@ class DailySummary:
                 has_attachments,
                 body_length
             ))
+<<<<<<< HEAD
 
             conn.commit()
             conn.close()
@@ -143,12 +203,33 @@ class DailySummary:
         Args:
             target_date (str): Fecha objetivo (formato YYYY-MM-DD)
 
+=======
+            
+            conn.commit()
+            conn.close()
+            
+            self.logger.debug(f"Correo registrado: {sender} -> {recipient[:50]}...")
+            return True
+            
+        except sqlite3.Error as e:
+            self.logger.error(f"Error registrando correo: {e}")
+            return False
+    
+    def generate_daily_summary(self, target_date: Optional[str] = None) -> Optional[Dict]:
+        """
+        Genera resumen diario hasta las 21:00
+        
+        Args:
+            target_date (str): Fecha objetivo (formato YYYY-MM-DD)
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Returns:
             dict: Resumen diario o None si no hay datos
         """
         try:
             if target_date is None:
                 target_date = datetime.now().strftime('%Y-%m-%d')
+<<<<<<< HEAD
 
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
@@ -156,11 +237,21 @@ class DailySummary:
             # Obtener correos del día hasta las 21:00
             cursor.execute('''
                 SELECT sender, sender_domain, recipient, subject, classification,
+=======
+            
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            # Obtener correos del día hasta las 21:00
+            cursor.execute('''
+                SELECT sender, sender_domain, recipient, subject, classification, 
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
                        sender_group, priority, time, has_attachments, body_length
                 FROM email_stats
                 WHERE date = ? AND time <= '21:00:00'
                 ORDER BY time
             ''', (target_date,))
+<<<<<<< HEAD
 
             emails = cursor.fetchall()
             conn.close()
@@ -190,6 +281,37 @@ class DailySummary:
             emails (list): Lista de tuplas con datos de correos
             target_date (str): Fecha objetivo
 
+=======
+            
+            emails = cursor.fetchall()
+            conn.close()
+            
+            if not emails:
+                self.logger.info(f"No hay correos para generar resumen del {target_date}")
+                return None
+            
+            # Procesar datos
+            summary = self._process_email_data(emails, target_date)
+            
+            # Guardar estadísticas diarias consolidadas
+            self._save_daily_stats(summary)
+            
+            self.logger.info(f"Resumen diario generado para {target_date}: {summary['total_emails']} correos")
+            return summary
+            
+        except sqlite3.Error as e:
+            self.logger.error(f"Error generando resumen diario: {e}")
+            return None
+    
+    def _process_email_data(self, emails: List[Tuple], target_date: str) -> Dict:
+        """
+        Procesa los datos de correos para generar estadísticas
+        
+        Args:
+            emails (list): Lista de tuplas con datos de correos
+            target_date (str): Fecha objetivo
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Returns:
             dict: Estadísticas procesadas
         """
@@ -200,6 +322,7 @@ class DailySummary:
         classifications = Counter()
         sender_groups = Counter()
         priorities = Counter()
+<<<<<<< HEAD
 
         # Análisis por horas
         hourly_activity = defaultdict(int)
@@ -211,6 +334,19 @@ class DailySummary:
         for email in emails:
             sender, domain, recipient, subject, classification, sender_group, priority, time_str, has_attachments, body_length = email
 
+=======
+        
+        # Análisis por horas
+        hourly_activity = defaultdict(int)
+        
+        # Estadísticas adicionales
+        total_attachments = 0
+        total_body_length = 0
+        
+        for email in emails:
+            sender, domain, recipient, subject, classification, sender_group, priority, time_str, has_attachments, body_length = email
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             # Contadores básicos
             senders[sender] += 1
             domains[domain] += 1
@@ -218,18 +354,27 @@ class DailySummary:
             classifications[classification] += 1
             sender_groups[sender_group] += 1
             priorities[priority] += 1
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             # Análisis por hora
             try:
                 hour = int(time_str.split(':')[0])
                 hourly_activity[hour] += 1
             except (ValueError, IndexError):
                 pass
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             # Estadísticas adicionales
             if has_attachments:
                 total_attachments += 1
             total_body_length += body_length or 0
+<<<<<<< HEAD
 
         # Calcular estadísticas derivadas
         total_emails = len(emails)
@@ -238,6 +383,16 @@ class DailySummary:
         # Hora más activa
         most_active_hour = max(hourly_activity.items(), key=lambda x: x[1])[0] if hourly_activity else 12
 
+=======
+        
+        # Calcular estadísticas derivadas
+        total_emails = len(emails)
+        avg_body_length = total_body_length / total_emails if total_emails > 0 else 0
+        
+        # Hora más activa
+        most_active_hour = max(hourly_activity.items(), key=lambda x: x[1])[0] if hourly_activity else 12
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         # Construir resumen
         summary = {
             'date': target_date,
@@ -262,6 +417,7 @@ class DailySummary:
             'percentage_urgent': round((classifications.get('Urgente', 0) / total_emails) * 100, 1) if total_emails > 0 else 0,
             'percentage_important': round((classifications.get('Importante', 0) / total_emails) * 100, 1) if total_emails > 0 else 0
         }
+<<<<<<< HEAD
 
         return summary
 
@@ -272,15 +428,33 @@ class DailySummary:
         Args:
             summary (dict): Resumen diario
 
+=======
+        
+        return summary
+    
+    def _save_daily_stats(self, summary: Dict) -> bool:
+        """
+        Guarda estadísticas diarias consolidadas
+        
+        Args:
+            summary (dict): Resumen diario
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Returns:
             bool: True si se guardó exitosamente
         """
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
+<<<<<<< HEAD
 
             cursor.execute('''
                 INSERT OR REPLACE INTO daily_stats
+=======
+            
+            cursor.execute('''
+                INSERT OR REPLACE INTO daily_stats 
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
                 (date, total_emails, urgent_emails, important_emails, other_emails,
                  top_sender, top_domain, most_active_hour)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -294,6 +468,7 @@ class DailySummary:
                 summary['top_domain'],
                 summary['most_active_hour']
             ))
+<<<<<<< HEAD
 
             conn.commit()
             conn.close()
@@ -312,21 +487,52 @@ class DailySummary:
         Args:
             target_date (str): Fecha objetivo (se calculará la semana)
 
+=======
+            
+            conn.commit()
+            conn.close()
+            
+            self.logger.debug(f"Estadísticas diarias guardadas para {summary['date']}")
+            return True
+            
+        except sqlite3.Error as e:
+            self.logger.error(f"Error guardando estadísticas diarias: {e}")
+            return False
+    
+    def get_weekly_summary(self, target_date: Optional[str] = None) -> Optional[Dict]:
+        """
+        Genera resumen semanal
+        
+        Args:
+            target_date (str): Fecha objetivo (se calculará la semana)
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Returns:
             dict: Resumen semanal
         """
         try:
             if target_date is None:
                 target_date = datetime.now().strftime('%Y-%m-%d')
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             # Calcular rango de la semana
             target_dt = datetime.strptime(target_date, '%Y-%m-%d')
             start_of_week = target_dt - timedelta(days=target_dt.weekday())
             end_of_week = start_of_week + timedelta(days=6)
+<<<<<<< HEAD
 
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
 
+=======
+            
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             cursor.execute('''
                 SELECT date, total_emails, urgent_emails, important_emails, other_emails,
                        top_sender, top_domain, most_active_hour
@@ -334,6 +540,7 @@ class DailySummary:
                 WHERE date BETWEEN ? AND ?
                 ORDER BY date
             ''', (start_of_week.strftime('%Y-%m-%d'), end_of_week.strftime('%Y-%m-%d')))
+<<<<<<< HEAD
 
             weekly_data = cursor.fetchall()
             conn.close()
@@ -341,12 +548,25 @@ class DailySummary:
             if not weekly_data:
                 return None
 
+=======
+            
+            weekly_data = cursor.fetchall()
+            conn.close()
+            
+            if not weekly_data:
+                return None
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             # Procesar datos semanales
             total_emails = sum(row[1] for row in weekly_data)
             total_urgent = sum(row[2] for row in weekly_data)
             total_important = sum(row[3] for row in weekly_data)
             total_other = sum(row[4] for row in weekly_data)
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             daily_breakdown = []
             for row in weekly_data:
                 daily_breakdown.append({
@@ -356,7 +576,11 @@ class DailySummary:
                     'important_emails': row[3],
                     'other_emails': row[4]
                 })
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             weekly_summary = {
                 'week_start': start_of_week.strftime('%Y-%m-%d'),
                 'week_end': end_of_week.strftime('%Y-%m-%d'),
@@ -368,6 +592,7 @@ class DailySummary:
                 'avg_daily_emails': round(total_emails / len(weekly_data), 1),
                 'busiest_day': max(daily_breakdown, key=lambda x: x['total_emails'])['date'] if daily_breakdown else None
             }
+<<<<<<< HEAD
 
             self.logger.info(f"Resumen semanal generado: {total_emails} correos en la semana")
             return weekly_summary
@@ -384,13 +609,35 @@ class DailySummary:
             year (int): Año
             month (int): Mes
 
+=======
+            
+            self.logger.info(f"Resumen semanal generado: {total_emails} correos en la semana")
+            return weekly_summary
+            
+        except Exception as e:
+            self.logger.error(f"Error generando resumen semanal: {e}")
+            return None
+    
+    def get_monthly_summary(self, year: int, month: int) -> Optional[Dict]:
+        """
+        Genera resumen mensual
+        
+        Args:
+            year (int): Año
+            month (int): Mes
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Returns:
             dict: Resumen mensual
         """
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             # Obtener datos del mes
             cursor.execute('''
                 SELECT date, total_emails, urgent_emails, important_emails, other_emails
@@ -398,6 +645,7 @@ class DailySummary:
                 WHERE date LIKE ?
                 ORDER BY date
             ''', (f"{year}-{month:02d}-%",))
+<<<<<<< HEAD
 
             monthly_data = cursor.fetchall()
             conn.close()
@@ -405,11 +653,24 @@ class DailySummary:
             if not monthly_data:
                 return None
 
+=======
+            
+            monthly_data = cursor.fetchall()
+            conn.close()
+            
+            if not monthly_data:
+                return None
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             total_emails = sum(row[1] for row in monthly_data)
             total_urgent = sum(row[2] for row in monthly_data)
             total_important = sum(row[3] for row in monthly_data)
             total_other = sum(row[4] for row in monthly_data)
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             monthly_summary = {
                 'year': year,
                 'month': month,
@@ -421,6 +682,7 @@ class DailySummary:
                 'avg_daily_emails': round(total_emails / len(monthly_data), 1),
                 'busiest_day': max(monthly_data, key=lambda x: x[1])[0] if monthly_data else None
             }
+<<<<<<< HEAD
 
             self.logger.info(f"Resumen mensual generado para {year}-{month:02d}: {total_emails} correos")
             return monthly_summary
@@ -436,12 +698,30 @@ class DailySummary:
         Args:
             date (str): Fecha del resumen
 
+=======
+            
+            self.logger.info(f"Resumen mensual generado para {year}-{month:02d}: {total_emails} correos")
+            return monthly_summary
+            
+        except Exception as e:
+            self.logger.error(f"Error generando resumen mensual: {e}")
+            return None
+    
+    def mark_summary_sent(self, date: str) -> bool:
+        """
+        Marca un resumen como enviado
+        
+        Args:
+            date (str): Fecha del resumen
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Returns:
             bool: True si se marcó exitosamente
         """
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
+<<<<<<< HEAD
 
             cursor.execute('''
                 UPDATE daily_stats
@@ -466,11 +746,38 @@ class DailySummary:
         Args:
             days_to_keep (int): Días de datos a mantener
 
+=======
+            
+            cursor.execute('''
+                UPDATE daily_stats 
+                SET summary_sent = 1 
+                WHERE date = ?
+            ''', (date,))
+            
+            conn.commit()
+            conn.close()
+            
+            self.logger.debug(f"Resumen marcado como enviado para {date}")
+            return True
+            
+        except sqlite3.Error as e:
+            self.logger.error(f"Error marcando resumen como enviado: {e}")
+            return False
+    
+    def cleanup_old_data(self, days_to_keep: int = 30) -> bool:
+        """
+        Limpia datos antiguos de la base de datos
+        
+        Args:
+            days_to_keep (int): Días de datos a mantener
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Returns:
             bool: True si se limpió exitosamente
         """
         try:
             cutoff_date = (datetime.now() - timedelta(days=days_to_keep)).strftime('%Y-%m-%d')
+<<<<<<< HEAD
 
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
@@ -479,10 +786,21 @@ class DailySummary:
             cursor.execute('DELETE FROM email_stats WHERE date < ?', (cutoff_date,))
             detailed_deleted = cursor.rowcount
 
+=======
+            
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            # Limpiar datos detallados
+            cursor.execute('DELETE FROM email_stats WHERE date < ?', (cutoff_date,))
+            detailed_deleted = cursor.rowcount
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             # Limpiar estadísticas diarias (mantener más tiempo)
             cutoff_date_stats = (datetime.now() - timedelta(days=days_to_keep * 2)).strftime('%Y-%m-%d')
             cursor.execute('DELETE FROM daily_stats WHERE date < ?', (cutoff_date_stats,))
             stats_deleted = cursor.rowcount
+<<<<<<< HEAD
 
             conn.commit()
             conn.close()
@@ -498,12 +816,30 @@ class DailySummary:
         """
         Obtiene estadísticas de la base de datos
 
+=======
+            
+            conn.commit()
+            conn.close()
+            
+            self.logger.info(f"Limpieza completada: {detailed_deleted} registros detallados, {stats_deleted} estadísticas diarias")
+            return True
+            
+        except sqlite3.Error as e:
+            self.logger.error(f"Error en limpieza de datos: {e}")
+            return False
+    
+    def get_database_stats(self) -> Dict:
+        """
+        Obtiene estadísticas de la base de datos
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Returns:
             dict: Estadísticas de la base de datos
         """
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
+<<<<<<< HEAD
 
             # Contar registros
             cursor.execute('SELECT COUNT(*) FROM email_stats')
@@ -521,6 +857,25 @@ class DailySummary:
 
             conn.close()
 
+=======
+            
+            # Contar registros
+            cursor.execute('SELECT COUNT(*) FROM email_stats')
+            total_emails = cursor.fetchone()[0]
+            
+            cursor.execute('SELECT COUNT(*) FROM daily_stats')
+            total_daily_stats = cursor.fetchone()[0]
+            
+            # Fechas de rango
+            cursor.execute('SELECT MIN(date), MAX(date) FROM email_stats')
+            date_range = cursor.fetchone()
+            
+            # Tamaño de archivo
+            file_size = os.path.getsize(self.db_path) if os.path.exists(self.db_path) else 0
+            
+            conn.close()
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             stats = {
                 'total_emails': total_emails,
                 'total_daily_stats': total_daily_stats,
@@ -530,6 +885,7 @@ class DailySummary:
                 },
                 'database_size_mb': round(file_size / (1024 * 1024), 2)
             }
+<<<<<<< HEAD
 
             self.logger.info(f"Estadísticas de BD: {stats}")
             return stats
@@ -545,6 +901,23 @@ class DailySummary:
         Args:
             email_address (str): Dirección de email
 
+=======
+            
+            self.logger.info(f"Estadísticas de BD: {stats}")
+            return stats
+            
+        except sqlite3.Error as e:
+            self.logger.error(f"Error obteniendo estadísticas de BD: {e}")
+            return {}
+    
+    def _extract_domain(self, email_address: str) -> str:
+        """
+        Extrae el dominio de una dirección de email
+        
+        Args:
+            email_address (str): Dirección de email
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         Returns:
             str: Dominio extraído
         """
@@ -552,7 +925,14 @@ class DailySummary:
             # Extraer email de formato "Nombre <email@domain.com>"
             if '<' in email_address and '>' in email_address:
                 email_address = email_address.split('<')[1].split('>')[0]
+<<<<<<< HEAD
 
             return email_address.split('@')[1].lower() if '@' in email_address else 'unknown'
         except:
             return 'unknown'
+=======
+            
+            return email_address.split('@')[1].lower() if '@' in email_address else 'unknown'
+        except:
+            return 'unknown'
+>>>>>>> e005211167595a977bd48a5de5c490387319132d

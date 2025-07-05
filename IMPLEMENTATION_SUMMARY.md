@@ -154,7 +154,11 @@ python scheduler.py
 El sistema aplica etiquetas automáticamente:
 
 - **`IA/Urgente`** - Correos clasificados como urgentes
+<<<<<<< HEAD
 - **`IA/Importante`** - Correos importantes
+=======
+- **`IA/Importante`** - Correos importantes  
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
 - **`Grupos/Trabajo`** - Por grupo de remitente
 - **`Prioridad/Alta`** - Por nivel de prioridad
 - **`Fecha/2024-01`** - Por mes/año
@@ -176,7 +180,11 @@ Cada día a las 21:00 se genera automáticamente:
 Respuestas inteligentes basadas en clasificación:
 
 - **Urgente**: Respuesta en 4-6 horas
+<<<<<<< HEAD
 - **Importante**: Respuesta en 12-24 horas
+=======
+- **Importante**: Respuesta en 12-24 horas  
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
 - **Fuera de horario**: Respuesta el próximo día hábil
 - **Confirmación**: Respuesta estándar
 
@@ -296,7 +304,14 @@ El **Gmail Bot Avanzado** transforma completamente la gestión de correos de un 
 
 **Estado:** ✅ **LISTO PARA IMPLEMENTACIÓN**
 
+<<<<<<< HEAD
 **Tiempo estimado de configuración:** 2-4 horas
 **Tiempo estimado de desarrollo adicional:** 1-2 días para integración completa
 
 El sistema está diseñado para ser **retrocompatible** mientras ofrece capacidades **significativamente avanzadas** para la gestión moderna de correos electrónicos.
+=======
+**Tiempo estimado de configuración:** 2-4 horas  
+**Tiempo estimado de desarrollo adicional:** 1-2 días para integración completa
+
+El sistema está diseñado para ser **retrocompatible** mientras ofrece capacidades **significativamente avanzadas** para la gestión moderna de correos electrónicos.
+>>>>>>> e005211167595a977bd48a5de5c490387319132d

@@ -87,19 +87,31 @@ class GmailClient:
         'https://www.googleapis.com/auth/gmail.labels',
         'https://www.googleapis.com/auth/gmail.modify'
     ]
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def __init__(self, credentials_file='credentials.json'):
         self.credentials_file = credentials_file
         self.service = None
         self._authenticate()
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def _authenticate(self):
         """Autentica con Gmail API usando OAuth2"""
         creds = None
         if os.path.exists('token.pickle'):
             with open('token.pickle', 'rb') as token:
                 creds = pickle.load(token)
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())
@@ -107,10 +119,17 @@ class GmailClient:
                 flow = InstalledAppFlow.from_client_secrets_file(
                     self.credentials_file, self.SCOPES)
                 creds = flow.run_local_server(port=0)
+<<<<<<< HEAD
 
             with open('token.pickle', 'wb') as token:
                 pickle.dump(creds, token)
 
+=======
+            
+            with open('token.pickle', 'wb') as token:
+                pickle.dump(creds, token)
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         self.service = build('gmail', 'v1', credentials=creds)
 ```
 
@@ -130,6 +149,7 @@ class EmailSender:
     def __init__(self, gmail_client):
         self.gmail_client = gmail_client
         self.templates_dir = "templates"
+<<<<<<< HEAD
 
     def send_auto_reply(self, original_message, reply_type="acknowledgment"):
         """Envía respuesta automática basada en clasificación"""
@@ -142,28 +162,56 @@ class EmailSender:
         sender = self._extract_sender(original_message)
         subject = self._extract_subject(original_message)
 
+=======
+    
+    def send_auto_reply(self, original_message, reply_type="acknowledgment"):
+        """Envía respuesta automática basada en clasificación"""
+        template_path = f"{self.templates_dir}/auto_reply.html"
+        
+        with open(template_path, 'r', encoding='utf-8') as f:
+            template = Template(f.read())
+        
+        # Extraer información del mensaje original
+        sender = self._extract_sender(original_message)
+        subject = self._extract_subject(original_message)
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         # Generar respuesta
         reply_content = template.render(
             sender_name=sender,
             original_subject=subject,
             reply_type=reply_type
         )
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         # Crear mensaje de respuesta
         reply_msg = MIMEMultipart()
         reply_msg['To'] = sender
         reply_msg['Subject'] = f"Re: {subject}"
         reply_msg['In-Reply-To'] = original_message['id']
+<<<<<<< HEAD
 
         reply_msg.attach(MIMEText(reply_content, 'html'))
 
         # Enviar
         raw_message = base64.urlsafe_b64encode(reply_msg.as_bytes()).decode()
 
+=======
+        
+        reply_msg.attach(MIMEText(reply_content, 'html'))
+        
+        # Enviar
+        raw_message = base64.urlsafe_b64encode(reply_msg.as_bytes()).decode()
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         self.gmail_client.service.users().messages().send(
             userId='me',
             body={'raw': raw_message}
         ).execute()
+<<<<<<< HEAD
 
     def send_daily_summary(self, summary_data, recipient):
         """Envía resumen diario vía Gmail"""
@@ -172,6 +220,16 @@ class EmailSender:
         with open(template_path, 'r', encoding='utf-8') as f:
             template = Template(f.read())
 
+=======
+    
+    def send_daily_summary(self, summary_data, recipient):
+        """Envía resumen diario vía Gmail"""
+        template_path = f"{self.templates_dir}/daily_summary.html"
+        
+        with open(template_path, 'r', encoding='utf-8') as f:
+            template = Template(f.read())
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         summary_content = template.render(
             date=summary_data['date'],
             total_emails=summary_data['total_emails'],
@@ -179,6 +237,7 @@ class EmailSender:
             recipients=summary_data['recipients'],
             categories=summary_data['categories']
         )
+<<<<<<< HEAD
 
         msg = MIMEMultipart()
         msg['To'] = recipient
@@ -188,6 +247,17 @@ class EmailSender:
 
         raw_message = base64.urlsafe_b64encode(msg.as_bytes()).decode()
 
+=======
+        
+        msg = MIMEMultipart()
+        msg['To'] = recipient
+        msg['Subject'] = f"📊 Resumen Diario de Correos - {summary_data['date']}"
+        
+        msg.attach(MIMEText(summary_content, 'html'))
+        
+        raw_message = base64.urlsafe_b64encode(msg.as_bytes()).decode()
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         self.gmail_client.service.users().messages().send(
             userId='me',
             body={'raw': raw_message}
@@ -202,13 +272,21 @@ class LabelManager:
     def __init__(self, gmail_client):
         self.gmail_client = gmail_client
         self.existing_labels = self._get_existing_labels()
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def _get_existing_labels(self):
         """Obtiene etiquetas existentes"""
         results = self.gmail_client.service.users().labels().list(userId='me').execute()
         labels = results.get('labels', [])
         return {label['name']: label['id'] for label in labels}
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def create_label_if_not_exists(self, label_name, color='#4285f4'):
         """Crea etiqueta si no existe"""
         if label_name not in self.existing_labels:
@@ -221,11 +299,16 @@ class LabelManager:
                     'textColor': '#ffffff'
                 }
             }
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             result = self.gmail_client.service.users().labels().create(
                 userId='me',
                 body=label_object
             ).execute()
+<<<<<<< HEAD
 
             self.existing_labels[label_name] = result['id']
             return result['id']
@@ -236,16 +319,36 @@ class LabelManager:
         """Aplica etiquetas basadas en clasificación IA"""
         labels_to_apply = []
 
+=======
+            
+            self.existing_labels[label_name] = result['id']
+            return result['id']
+        
+        return self.existing_labels[label_name]
+    
+    def apply_smart_labels(self, message_id, classification, sender_group):
+        """Aplica etiquetas basadas en clasificación IA"""
+        labels_to_apply = []
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         # Etiqueta por clasificación IA
         if classification != "Otros":
             label_id = self.create_label_if_not_exists(f"IA/{classification}")
             labels_to_apply.append(label_id)
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         # Etiqueta por grupo de remitente
         if sender_group != "Otros":
             label_id = self.create_label_if_not_exists(f"Grupos/{sender_group}")
             labels_to_apply.append(label_id)
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         # Aplicar etiquetas
         if labels_to_apply:
             self.gmail_client.service.users().messages().modify(
@@ -253,7 +356,11 @@ class LabelManager:
                 id=message_id,
                 body={'addLabelIds': labels_to_apply}
             ).execute()
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def organize_by_priority(self, message_id, priority_level):
         """Organiza por nivel de prioridad"""
         priority_colors = {
@@ -261,12 +368,21 @@ class LabelManager:
             'Media': '#ffaa00',
             'Baja': '#00ff00'
         }
+<<<<<<< HEAD
 
         label_name = f"Prioridad/{priority_level}"
         color = priority_colors.get(priority_level, '#4285f4')
 
         label_id = self.create_label_if_not_exists(label_name, color)
 
+=======
+        
+        label_name = f"Prioridad/{priority_level}"
+        color = priority_colors.get(priority_level, '#4285f4')
+        
+        label_id = self.create_label_if_not_exists(label_name, color)
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         self.gmail_client.service.users().messages().modify(
             userId='me',
             id=message_id,
@@ -286,12 +402,20 @@ class DailySummary:
     def __init__(self, db_path="email_stats.db"):
         self.db_path = db_path
         self._init_database()
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def _init_database(self):
         """Inicializa base de datos para estadísticas"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS email_stats (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -305,19 +429,34 @@ class DailySummary:
                 message_id TEXT UNIQUE NOT NULL
             )
         ''')
+<<<<<<< HEAD
 
         conn.commit()
         conn.close()
 
+=======
+        
+        conn.commit()
+        conn.close()
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def record_email(self, sender, recipient, subject, classification, sender_group, message_id):
         """Registra un correo en las estadísticas"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
+<<<<<<< HEAD
 
         now = datetime.now()
 
         cursor.execute('''
             INSERT OR REPLACE INTO email_stats
+=======
+        
+        now = datetime.now()
+        
+        cursor.execute('''
+            INSERT OR REPLACE INTO email_stats 
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             (date, time, sender, recipient, subject, classification, sender_group, message_id)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
@@ -330,18 +469,32 @@ class DailySummary:
             sender_group,
             message_id
         ))
+<<<<<<< HEAD
 
         conn.commit()
         conn.close()
 
+=======
+        
+        conn.commit()
+        conn.close()
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def generate_daily_summary(self, target_date=None):
         """Genera resumen diario hasta las 21:00"""
         if target_date is None:
             target_date = datetime.now().strftime('%Y-%m-%d')
+<<<<<<< HEAD
 
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
+=======
+        
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         # Obtener correos del día hasta las 21:00
         cursor.execute('''
             SELECT sender, recipient, classification, sender_group, time
@@ -349,6 +502,7 @@ class DailySummary:
             WHERE date = ? AND time <= '21:00:00'
             ORDER BY time
         ''', (target_date,))
+<<<<<<< HEAD
 
         emails = cursor.fetchall()
         conn.close()
@@ -356,18 +510,35 @@ class DailySummary:
         if not emails:
             return None
 
+=======
+        
+        emails = cursor.fetchall()
+        conn.close()
+        
+        if not emails:
+            return None
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         # Analizar datos
         senders = Counter(email[0] for email in emails)
         recipients = Counter(email[1] for email in emails)
         classifications = Counter(email[2] for email in emails)
         sender_groups = Counter(email[3] for email in emails)
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         # Análisis por horas
         hourly_activity = defaultdict(int)
         for email in emails:
             hour = email[4].split(':')[0]
             hourly_activity[hour] += 1
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         summary = {
             'date': target_date,
             'total_emails': len(emails),
@@ -378,7 +549,11 @@ class DailySummary:
             'hourly_activity': dict(hourly_activity),
             'most_active_hour': max(hourly_activity.items(), key=lambda x: x[1])[0] if hourly_activity else None
         }
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         return summary
 ```
 
@@ -399,11 +574,16 @@ class EmailScheduler:
         self.daily_summary = daily_summary
         self.telegram_notifier = telegram_notifier
         self.setup_schedules()
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def setup_schedules(self):
         """Configura tareas programadas"""
         # Resumen diario a las 21:00
         schedule.every().day.at("21:00").do(self.send_daily_summary)
+<<<<<<< HEAD
 
         # Limpieza de base de datos semanal
         schedule.every().sunday.at("00:00").do(self.cleanup_old_data)
@@ -411,19 +591,37 @@ class EmailScheduler:
         # Verificación de correos cada 2 minutos
         schedule.every(2).minutes.do(self.process_emails)
 
+=======
+        
+        # Limpieza de base de datos semanal
+        schedule.every().sunday.at("00:00").do(self.cleanup_old_data)
+        
+        # Verificación de correos cada 2 minutos
+        schedule.every(2).minutes.do(self.process_emails)
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def send_daily_summary(self):
         """Envía resumen diario"""
         try:
             summary = self.daily_summary.generate_daily_summary()
+<<<<<<< HEAD
 
             if summary:
                 # Enviar por Telegram
                 asyncio.run(self.telegram_notifier.send_daily_summary(summary))
 
+=======
+            
+            if summary:
+                # Enviar por Telegram
+                asyncio.run(self.telegram_notifier.send_daily_summary(summary))
+                
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
                 # Opcional: enviar por email
                 recipient = os.getenv("SUMMARY_EMAIL_RECIPIENT")
                 if recipient:
                     self.email_sender.send_daily_summary(summary, recipient)
+<<<<<<< HEAD
 
                 print(f"[INFO] ✅ Resumen diario enviado - {summary['total_emails']} correos procesados")
             else:
@@ -432,11 +630,22 @@ class EmailScheduler:
         except Exception as e:
             print(f"[ERROR] Error enviando resumen diario: {e}")
 
+=======
+                
+                print(f"[INFO] ✅ Resumen diario enviado - {summary['total_emails']} correos procesados")
+            else:
+                print("[INFO] No hay correos para el resumen diario")
+                
+        except Exception as e:
+            print(f"[ERROR] Error enviando resumen diario: {e}")
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def cleanup_old_data(self):
         """Limpia datos antiguos de la base de datos"""
         try:
             conn = sqlite3.connect(self.daily_summary.db_path)
             cursor = conn.cursor()
+<<<<<<< HEAD
 
             # Eliminar registros más antiguos de 30 días
             cutoff_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
@@ -450,15 +659,38 @@ class EmailScheduler:
         except Exception as e:
             print(f"[ERROR] Error en limpieza de datos: {e}")
 
+=======
+            
+            # Eliminar registros más antiguos de 30 días
+            cutoff_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+            cursor.execute('DELETE FROM email_stats WHERE date < ?', (cutoff_date,))
+            
+            conn.commit()
+            conn.close()
+            
+            print("[INFO] ✅ Limpieza de datos antiguos completada")
+            
+        except Exception as e:
+            print(f"[ERROR] Error en limpieza de datos: {e}")
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def process_emails(self):
         """Procesa correos nuevos"""
         # Esta función reemplazará el loop principal del main.py original
         pass
+<<<<<<< HEAD
 
     def run(self):
         """Ejecuta el scheduler"""
         print("[INFO] 📅 Iniciando programador de tareas...")
 
+=======
+    
+    def run(self):
+        """Ejecuta el scheduler"""
+        print("[INFO] 📅 Iniciando programador de tareas...")
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         while True:
             schedule.run_pending()
             time.sleep(1)
@@ -497,12 +729,17 @@ class GmailBotAdvanced:
             self.daily_summary,
             self.telegram_notifier
         )
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def process_new_emails(self):
         """Procesa correos nuevos con funcionalidades avanzadas"""
         try:
             # Obtener correos no leídos
             results = self.gmail_client.service.users().messages().list(
+<<<<<<< HEAD
                 userId='me',
                 q='is:unread'
             ).execute()
@@ -512,16 +749,32 @@ class GmailBotAdvanced:
             for message in messages:
                 message_id = message['id']
 
+=======
+                userId='me', 
+                q='is:unread'
+            ).execute()
+            
+            messages = results.get('messages', [])
+            
+            for message in messages:
+                message_id = message['id']
+                
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
                 # Obtener detalles del mensaje
                 msg = self.gmail_client.service.users().messages().get(
                     userId='me',
                     id=message_id
                 ).execute()
+<<<<<<< HEAD
 
+=======
+                
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
                 # Extraer información
                 sender = self._extract_sender(msg)
                 subject = self._extract_subject(msg)
                 body = self._extract_body(msg)
+<<<<<<< HEAD
 
                 # Clasificar con IA
                 classification = self.email_classifier.classify_email(subject, body)
@@ -530,21 +783,40 @@ class GmailBotAdvanced:
                 # Aplicar etiquetas inteligentes
                 self.label_manager.apply_smart_labels(message_id, classification, sender_group)
 
+=======
+                
+                # Clasificar con IA
+                classification = self.email_classifier.classify_email(subject, body)
+                sender_group = self._get_sender_group(sender)
+                
+                # Aplicar etiquetas inteligentes
+                self.label_manager.apply_smart_labels(message_id, classification, sender_group)
+                
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
                 # Determinar prioridad
                 priority = self._determine_priority(classification, sender_group)
                 if priority != 'Baja':
                     self.label_manager.organize_by_priority(message_id, priority)
+<<<<<<< HEAD
 
+=======
+                
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
                 # Registrar en estadísticas
                 self.daily_summary.record_email(
                     sender, 'me', subject, classification, sender_group, message_id
                 )
+<<<<<<< HEAD
 
+=======
+                
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
                 # Enviar notificación si es necesario
                 if self._should_notify(classification, sender_group):
                     await self.telegram_notifier.notify_telegram(
                         subject, sender, body[:200], classification
                     )
+<<<<<<< HEAD
 
                 # Respuesta automática si es necesario
                 if self._should_auto_reply(classification, sender_group):
@@ -555,27 +827,55 @@ class GmailBotAdvanced:
         except Exception as e:
             print(f"[ERROR] Error procesando correos: {e}")
 
+=======
+                
+                # Respuesta automática si es necesario
+                if self._should_auto_reply(classification, sender_group):
+                    self.email_sender.send_auto_reply(msg, classification.lower())
+                
+                print(f"[INFO] ✅ Procesado: {subject[:50]}... | {classification} | {sender_group}")
+                
+        except Exception as e:
+            print(f"[ERROR] Error procesando correos: {e}")
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     def run(self):
         """Ejecuta el bot avanzado"""
         print("🚀 Iniciando Gmail Bot Avanzado...")
         print("📧 Funcionalidades: Lectura, Envío, Etiquetado, Resúmenes")
+<<<<<<< HEAD
 
         # Ejecutar scheduler en hilo separado
         scheduler_thread = Thread(target=self.scheduler.run, daemon=True)
         scheduler_thread.start()
 
+=======
+        
+        # Ejecutar scheduler en hilo separado
+        scheduler_thread = Thread(target=self.scheduler.run, daemon=True)
+        scheduler_thread.start()
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         # Loop principal
         try:
             while True:
                 asyncio.run(self.process_new_emails())
                 time.sleep(120)  # Revisar cada 2 minutos
+<<<<<<< HEAD
 
+=======
+                
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         except KeyboardInterrupt:
             print("\n🛑 Bot detenido por el usuario")
 
 if __name__ == "__main__":
     import sys
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
     if len(sys.argv) > 1:
         if sys.argv[1] == "setup":
             print("🔧 Configurando credenciales OAuth2...")
@@ -651,11 +951,19 @@ LOG_LEVEL=INFO
 <body>
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>🤖 Respuesta Automática</h2>
+<<<<<<< HEAD
 
         <p>Hola {{ sender_name }},</p>
 
         <p>Gracias por tu correo con asunto "<strong>{{ original_subject }}</strong>".</p>
 
+=======
+        
+        <p>Hola {{ sender_name }},</p>
+        
+        <p>Gracias por tu correo con asunto "<strong>{{ original_subject }}</strong>".</p>
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         {% if reply_type == "acknowledgment" %}
         <p>He recibido tu mensaje y te responderé tan pronto como sea posible.</p>
         {% elif reply_type == "urgente" %}
@@ -663,9 +971,15 @@ LOG_LEVEL=INFO
         {% elif reply_type == "importante" %}
         <p>Tu mensaje ha sido clasificado como importante y será revisado pronto.</p>
         {% endif %}
+<<<<<<< HEAD
 
         <p>Gracias por tu paciencia.</p>
 
+=======
+        
+        <p>Gracias por tu paciencia.</p>
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         <hr>
         <p><small>Este es un mensaje automático generado por Gmail Bot Avanzado.</small></p>
     </div>
@@ -687,7 +1001,11 @@ LOG_LEVEL=INFO
     <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto;">
         <h1>📊 Resumen Diario de Correos</h1>
         <h2>{{ date }}</h2>
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3>📈 Estadísticas Generales</h3>
             <ul>
@@ -695,7 +1013,11 @@ LOG_LEVEL=INFO
                 <li><strong>Hora más activa:</strong> {{ hourly_activity.keys() | max }}:00</li>
             </ul>
         </div>
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         <div style="display: flex; gap: 20px; margin: 20px 0;">
             <div style="flex: 1; background-color: #e3f2fd; padding: 15px; border-radius: 8px;">
                 <h3>📬 Top Remitentes</h3>
@@ -705,7 +1027,11 @@ LOG_LEVEL=INFO
                     {% endfor %}
                 </ul>
             </div>
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
             <div style="flex: 1; background-color: #f3e5f5; padding: 15px; border-radius: 8px;">
                 <h3>🏷️ Por Categorías</h3>
                 <ul>
@@ -715,7 +1041,11 @@ LOG_LEVEL=INFO
                 </ul>
             </div>
         </div>
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         <div style="background-color: #fff3e0; padding: 15px; border-radius: 8px; margin: 20px 0;">
             <h3>👥 Grupos de Remitentes</h3>
             <ul>
@@ -724,7 +1054,11 @@ LOG_LEVEL=INFO
                 {% endfor %}
             </ul>
         </div>
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
         <hr>
         <p><small>Resumen generado automáticamente por Gmail Bot Avanzado - {{ date }} 21:00</small></p>
     </div>
@@ -803,4 +1137,8 @@ LOG_LEVEL=INFO
 - Documentación: 1 día
 - Contingencia: 1 día
 
+<<<<<<< HEAD
 Este plan transformará el bot actual en un **sistema completo de gestión de Gmail** con capacidades avanzadas de automatización, clasificación inteligente, y reporting comprehensivo.
+=======
+Este plan transformará el bot actual en un **sistema completo de gestión de Gmail** con capacidades avanzadas de automatización, clasificación inteligente, y reporting comprehensivo.
+>>>>>>> e005211167595a977bd48a5de5c490387319132d
