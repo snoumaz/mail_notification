@@ -498,6 +498,7 @@ class EmailMonitor:
                 )
             mail.select("inbox")
 
+            # Buscar correos no leídos sin marcarlos como leídos
             status, messages = mail.search(None, "(UNSEEN)")
             if status != "OK":
                 self.logger.warning("No se pudieron buscar correos.")
@@ -512,6 +513,7 @@ class EmailMonitor:
             self.logger.info(f"Procesando {len(email_ids)} correos nuevos...")
 
             for e_id in email_ids:
+                # Obtener el correo sin marcarlo como leído
                 _, msg_data = mail.fetch(e_id, "(RFC822)")
                 for response_part in msg_data:
                     if isinstance(response_part, tuple):
@@ -549,7 +551,8 @@ class EmailMonitor:
                                     f"✅ ENVIANDO NOTIFICACIÓN - Motivo: {'IA' if label != 'Otros' else 'Grupo' if sender_group != 'Otros' else 'Palabras clave' if any(kw in email_msg.subject.lower() or kw in email_msg.body.lower() for kw in self.keywords) else 'Dominio' if email_msg.sender_domain in self.notify_domains else 'Urgente'}"
                                 )
 
-                                asyncio.run(
+                                # Enviar notificación
+                                notification_sent = asyncio.run(
                                     self.telegram_notifier.send_notification(
                                         email_msg.subject,
                                         email_msg.sender,
@@ -558,10 +561,21 @@ class EmailMonitor:
                                         sender_group,
                                     )
                                 )
+                                
+                                # Solo marcar como leído si la notificación se envió correctamente
+                                if notification_sent:
+                                    # Marcar como leído después de enviar la notificación
+                                    mail.store(e_id, '+FLAGS', '\\Seen')
+                                    self.logger.info(f"✅ Correo marcado como leído después de notificar")
+                                else:
+                                    self.logger.warning(f"⚠️ Correo NO marcado como leído - notificación falló")
                             else:
                                 self.logger.info(
                                     f"❌ NO se envía notificación - Todos los criterios son False"
                                 )
+                                # Marcar como leído aunque no se notifique (para evitar procesarlo de nuevo)
+                                mail.store(e_id, '+FLAGS', '\\Seen')
+                                self.logger.info(f"✅ Correo marcado como leído (sin notificación)")
 
                             # Registrar email en el resumen diario
                             email_data = {
