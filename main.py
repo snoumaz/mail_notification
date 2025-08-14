@@ -108,6 +108,8 @@ def test_telegram():
         monitor = EmailMonitor(config)
 
         logger.info("Probando conexión a Telegram...")
+
+        # Usar asyncio.run de manera más robusta
         success = asyncio.run(monitor.test_telegram_connection())
 
         if success:
