@@ -561,21 +561,27 @@ class EmailMonitor:
                                         sender_group,
                                     )
                                 )
-                                
+
                                 # Solo marcar como leído si la notificación se envió correctamente
                                 if notification_sent:
                                     # Marcar como leído después de enviar la notificación
-                                    mail.store(e_id, '+FLAGS', '\\Seen')
-                                    self.logger.info(f"✅ Correo marcado como leído después de notificar")
+                                    mail.store(e_id, "+FLAGS", "\\Seen")
+                                    self.logger.info(
+                                        f"✅ Correo marcado como leído después de notificar"
+                                    )
                                 else:
-                                    self.logger.warning(f"⚠️ Correo NO marcado como leído - notificación falló")
+                                    self.logger.warning(
+                                        f"⚠️ Correo NO marcado como leído - notificación falló"
+                                    )
                             else:
                                 self.logger.info(
                                     f"❌ NO se envía notificación - Todos los criterios son False"
                                 )
                                 # Marcar como leído aunque no se notifique (para evitar procesarlo de nuevo)
-                                mail.store(e_id, '+FLAGS', '\\Seen')
-                                self.logger.info(f"✅ Correo marcado como leído (sin notificación)")
+                                mail.store(e_id, "+FLAGS", "\\Seen")
+                                self.logger.info(
+                                    f"✅ Correo marcado como leído (sin notificación)"
+                                )
 
                             # Registrar email en el resumen diario
                             email_data = {
