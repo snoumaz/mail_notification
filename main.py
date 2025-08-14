@@ -6,6 +6,7 @@ import os
 import sys
 import time
 import logging
+import asyncio
 from dotenv import load_dotenv
 from src.core import EmailMonitor
 
@@ -77,7 +78,9 @@ def main():
         logger.info(
             f"Grupos configurados: {list(monitor.sender_groups.get_groups().keys())}"
         )
-        logger.info(f"Resumen diario programado para las: {config.get('DAILY_SUMMARY_TIME', '21:00')}")
+        logger.info(
+            f"Resumen diario programado para las: {config.get('DAILY_SUMMARY_TIME', '21:00')}"
+        )
 
         # Iniciar scheduler del resumen diario
         monitor.start_daily_summary_scheduler()
@@ -105,7 +108,7 @@ def test_telegram():
         monitor = EmailMonitor(config)
 
         logger.info("Probando conexión a Telegram...")
-        success = monitor.test_telegram_connection()
+        success = asyncio.run(monitor.test_telegram_connection())
 
         if success:
             logger.success("Conexión a Telegram exitosa")
@@ -165,6 +168,43 @@ def send_manual_summary():
         logger.error(f"Error enviando resumen diario: {e}")
 
 
+def restart_scheduler():
+    """Reinicia el scheduler del resumen diario"""
+    logger = EmailMonitorLogger(__name__)
+
+    try:
+        config = load_config()
+        monitor = EmailMonitor(config)
+
+        logger.info("Reiniciando scheduler del resumen diario...")
+        monitor.daily_summary.restart_scheduler()
+        logger.success("Scheduler reiniciado correctamente")
+
+    except Exception as e:
+        logger.error(f"Error reiniciando scheduler: {e}")
+
+
+def check_scheduler_status():
+    """Verifica el estado del scheduler del resumen diario"""
+    logger = EmailMonitorLogger(__name__)
+
+    try:
+        config = load_config()
+        monitor = EmailMonitor(config)
+
+        logger.info("Verificando estado del scheduler...")
+        status = monitor.daily_summary.get_scheduler_status()
+
+        logger.info(f"Estado del scheduler:")
+        logger.info(f"  - Tareas activas: {status.get('active_jobs', 0)}")
+        logger.info(f"  - Próxima ejecución: {status.get('next_run', 'N/A')}")
+        logger.info(f"  - Hora configurada: {status.get('summary_time', 'N/A')}")
+        logger.info(f"  - Emails en cola: {status.get('emails_in_queue', 0)}")
+
+    except Exception as e:
+        logger.error(f"Error verificando estado del scheduler: {e}")
+
+
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         command = sys.argv[1]
@@ -175,9 +215,15 @@ if __name__ == "__main__":
             test_classification()
         elif command == "send_summary":
             send_manual_summary()
+        elif command == "restart_scheduler":
+            restart_scheduler()
+        elif command == "check_scheduler":
+            check_scheduler_status()
         else:
             print(f"Comando desconocido: {command}")
-            print("Comandos disponibles: test_telegram, test_classify, send_summary")
+            print(
+                "Comandos disponibles: test_telegram, test_classify, send_summary, restart_scheduler, check_scheduler"
+            )
             sys.exit(1)
     else:
         main()

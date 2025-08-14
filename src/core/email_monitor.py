@@ -202,9 +202,7 @@ class TelegramNotifier:
         """Envía el resumen diario a Telegram"""
         try:
             await self.bot.send_message(
-                chat_id=self.chat_id,
-                text=summary_text,
-                parse_mode="HTML"
+                chat_id=self.chat_id, text=summary_text, parse_mode="HTML"
             )
             self.logger.info("✅ Resumen diario enviado correctamente")
             return True
@@ -228,6 +226,10 @@ class DailySummaryManager:
     def _setup_scheduler(self):
         """Configura el scheduler para enviar resúmenes diarios"""
         try:
+            # Limpiar cualquier tarea existente
+            schedule.clear()
+
+            # Configurar la nueva tarea
             schedule.every().day.at(self.summary_time).do(self._send_daily_summary)
             self.logger.info(
                 f"📅 Resumen diario programado para las {self.summary_time}"
@@ -249,8 +251,19 @@ class DailySummaryManager:
             today = date.today().strftime("%d/%m/%Y")
             summary_text = self._generate_summary_text(today)
 
-            # Enviar resumen de manera asíncrona
-            asyncio.run(self.telegram_notifier.send_daily_summary(summary_text))
+            # Crear un nuevo event loop para el hilo del scheduler
+            try:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                loop.run_until_complete(
+                    self.telegram_notifier.send_daily_summary(summary_text)
+                )
+            except RuntimeError:
+                # Si ya hay un event loop corriendo, usar asyncio.run
+                asyncio.run(self.telegram_notifier.send_daily_summary(summary_text))
+            finally:
+                if "loop" in locals():
+                    loop.close()
 
             # Limpiar la lista después de enviar
             self.daily_emails.clear()
@@ -258,6 +271,7 @@ class DailySummaryManager:
 
         except Exception as e:
             self.logger.error(f"Error enviando resumen diario: {e}")
+            # No limpiar la lista en caso de error para que se pueda reintentar
 
     def _generate_summary_text(self, date_str: str) -> str:
         """Genera el texto del resumen diario"""
@@ -306,12 +320,39 @@ class DailySummaryManager:
 
         def run_schedule():
             while True:
-                schedule.run_pending()
-                time.sleep(60)  # Revisar cada minuto
+                try:
+                    schedule.run_pending()
+                    time.sleep(60)  # Revisar cada minuto
+                except Exception as e:
+                    self.logger.error(f"Error en el scheduler: {e}")
+                    time.sleep(60)  # Continuar después del error
 
         scheduler_thread = threading.Thread(target=run_schedule, daemon=True)
         scheduler_thread.start()
         self.logger.info("🔄 Scheduler de resumen diario iniciado")
+
+    def restart_scheduler(self):
+        """Reinicia el scheduler del resumen diario"""
+        try:
+            schedule.clear()
+            self._setup_scheduler()
+            self.logger.info("🔄 Scheduler reiniciado correctamente")
+        except Exception as e:
+            self.logger.error(f"Error reiniciando scheduler: {e}")
+
+    def get_scheduler_status(self) -> dict:
+        """Obtiene el estado actual del scheduler"""
+        try:
+            jobs = schedule.get_jobs()
+            return {
+                "active_jobs": len(jobs),
+                "next_run": str(jobs[0].next_run) if jobs else None,
+                "summary_time": self.summary_time,
+                "emails_in_queue": len(self.daily_emails),
+            }
+        except Exception as e:
+            self.logger.error(f"Error obteniendo estado del scheduler: {e}")
+            return {"error": str(e)}
 
 
 class EmailMonitor:
@@ -441,7 +482,20 @@ class EmailMonitor:
         try:
             self.logger.info(f"Conectando a {self.config['IMAP_SERVER']}...")
             mail = imaplib.IMAP4_SSL(self.config["IMAP_SERVER"])
-            mail.login(self.config["MAIL"], self.config["PASS"])
+
+            # Manejar codificación de credenciales
+            try:
+                mail.login(self.config["MAIL"], self.config["PASS"])
+            except UnicodeEncodeError:
+                # Si hay problemas de codificación, usar encode/decode
+                mail.login(
+                    self.config["MAIL"]
+                    .encode("utf-8")
+                    .decode("ascii", errors="ignore"),
+                    self.config["PASS"]
+                    .encode("utf-8")
+                    .decode("ascii", errors="ignore"),
+                )
             mail.select("inbox")
 
             status, messages = mail.search(None, "(UNSEEN)")
@@ -511,11 +565,11 @@ class EmailMonitor:
 
                             # Registrar email en el resumen diario
                             email_data = {
-                                'sender': email_msg.sender,
-                                'subject': email_msg.subject,
-                                'label': label,
-                                'sender_group': sender_group,
-                                'date': email_msg.date
+                                "sender": email_msg.sender,
+                                "subject": email_msg.subject,
+                                "label": label,
+                                "sender_group": sender_group,
+                                "date": email_msg.date,
                             }
                             self.daily_summary.add_email(email_data)
 

@@ -50,6 +50,9 @@ docker exec -it organizador_email_monitor python main.py send_summary
 | Probar clasificación IA      | `python main.py test_classify`                                          |
 | Ejecutar tests               | `python -m pytest tests/ -v`                                            |
 | Enviar resumen diario manual | `python main.py send_summary`                                           |
+| Reiniciar scheduler          | `python main.py restart_scheduler`                                      |
+| Verificar estado scheduler   | `python main.py check_scheduler`                                        |
+| Diagnóstico completo         | `python src/utils/diagnose_scheduler.py`                                |
 | Resumen manual en Docker     | `docker exec -it organizador_email_monitor python main.py send_summary` |
 
 ---
@@ -161,6 +164,55 @@ DAILY_SUMMARY_TIME=21:00
 ## Licencia
 
 Este proyecto es de código abierto y puede ser modificado y distribuido libremente.
+
+---
+
+## 🔧 Solución de Problemas del Resumen Diario
+
+Si el resumen diario deja de funcionar después del primer día, sigue estos pasos:
+
+### 1. Verificar el Estado del Scheduler
+
+```bash
+python main.py check_scheduler
+```
+
+### 2. Reiniciar el Scheduler
+
+```bash
+python main.py restart_scheduler
+```
+
+### 3. Diagnóstico Completo
+
+```bash
+python src/utils/diagnose_scheduler.py
+```
+
+### 4. Problemas Comunes
+
+**Problema**: El scheduler se detiene después del primer día
+
+- **Solución**: Reinicia el scheduler con `python main.py restart_scheduler`
+- **Causa**: Problemas con event loops de asyncio en hilos separados
+
+**Problema**: No se envían resúmenes aunque hay emails
+
+- **Solución**: Verifica la conexión a Telegram con `python main.py test_telegram`
+- **Causa**: Token de Telegram inválido o problemas de red
+
+**Problema**: El scheduler no se ejecuta a la hora programada
+
+- **Solución**: Verifica la configuración de `DAILY_SUMMARY_TIME` en el archivo `.env`
+- **Causa**: Formato de hora incorrecto (debe ser HH:MM)
+
+### 5. Logs de Diagnóstico
+
+Los logs del scheduler se guardan en `logs/email_monitor.log`. Busca mensajes que contengan:
+
+- `🔄 Scheduler de resumen diario iniciado`
+- `📅 Resumen diario programado para las`
+- `📊 Resumen diario enviado para`
 
 ---
 
